@@ -383,8 +383,9 @@ plot(present$year, ratio_boys_girls, type = "l",
      "main"="Annual births in America - Ratio of boys to girls")
 abline(present_ratio_model,col="blue")
 ```
-#### As with Arbuthnot's data from London in the 1600s, the present-day data likewise indicates that more boys than girls born annually in the US, similarly with a trend decreasing toward parity.  Here, there is initially a decrease in the boy-to-girl ratio during the 1940s and 1950s, then an increase during the 1960s, followed by a decrease.
 
+
+#### As with Arbuthnot's data from London in the 1600s, the present-day data likewise indicates that more boys than girls are born annually in the US, similarly with a trend decreasing toward parity.  Here, there is initially a decrease in the boys-to-girls ratio during the 1940s and 1950s, then an increase during the 1960s, followed by a decrease.
 
 -   In what year did we see the most total number of births in the U.S.? 
 
