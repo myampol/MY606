@@ -1,0 +1,427 @@
+---
+title: 'Lab5 - Inference for numerical data'
+author: "Michael Y."
+date: "October 28th, 2018"
+output:
+  pdf_document: default
+  html_document:
+    css: ./lab.css
+    highlight: pygments
+    theme: cerulean
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+directory = "c:/users/Michael/DROPBOX/priv/CUNY/MSDS/201809-Fall/DATA606_Jason/Labs/Lab5"
+knitr::opts_knit$set(root.dir = directory)
+options(scipen = 999, digits = 8)
+##setwd(directory)
+library(tidyr)
+library(dplyr)
+library(kableExtra)
+library(ggplot2)
+```
+
+## North Carolina births
+
+In 2004, the state of North Carolina released a large data set containing 
+information on births recorded in this state. This data set is useful to 
+researchers studying the relation between habits and practices of expectant 
+mothers and the birth of their children. We will work with a random sample of 
+observations from this data set.
+
+## Exploratory analysis
+
+Load the `nc` data set into our workspace.
+
+```{r load-data, eval=TRUE}
+load("more/nc.RData")
+```
+
+We have observations on 13 different variables, some categorical and some 
+numerical. The meaning of each variable is as follows.
+
+variable         | description
+---------------- | -----------
+`fage`           | father's age in years.
+`mage`           | mother's age in years.
+`mature`         | maturity status of mother.
+`weeks`          | length of pregnancy in weeks.
+`premie`         | whether the birth was classified as premature (premie) or full-term.
+`visits`         | number of hospital visits during pregnancy.
+`marital`        | whether mother is `married` or `not married` at birth.
+`gained`         | weight gained by mother during pregnancy in pounds.
+`weight`         | weight of the baby at birth in pounds.
+`lowbirthweight` | whether baby was classified as low birthweight (`low`) or not (`not low`).
+`gender`         | gender of the baby, `female` or `male`.
+`habit`          | status of the mother as a `nonsmoker` or a `smoker`.
+`whitemom`       | whether mom is `white` or `not white`.
+
+1.  What are the cases in this data set? How many cases are there in our sample?
+
+#### There are 1000 cases in this data set.  Each case represents information associated with the birth of a child in North Carolina in 2004.   The 13 features contain information about the baby, the mother and limited information about the father (just his age, if known.) 
+
+As a first step in the analysis, we should consider summaries of the data. This
+can be done using the `summary` command:
+
+```{r summary, eval=TRUE}
+summary(nc)
+```
+
+As you review the variable summaries, consider which variables are categorical 
+and which are numerical. For numerical variables, are there outliers? If you 
+aren't sure or want to take a closer look at the data, make a graph.
+
+Consider the possible relationship between a mother's smoking habit and the 
+weight of her baby. Plotting the data is a useful first step because it helps 
+us quickly visualize trends, identify strong associations, and develop research
+questions.
+
+2.  Make a side-by-side boxplot of `habit` and `weight`. What does the plot 
+highlight about the relationship between these two variables?
+
+```{r}
+boxplot(nc$weight~nc$habit,col=(c("lightblue","tan")))
+```
+
+#### The plots show that the median birth weight for children born to nonsmoking mothers appears to be slightly greater than the median birth weight for children born to mothers who smoke.   
+#### The sizable number of outliers at the bottom indicate that the distributions are left-skewed, as the  means for each group should be lower than the respective medians.    
+####There are a much larger number of outliers associated with non-smoking mothers, but from the above box plots alone it is not apparent that the two subsets are of very different size, with 873 nonsmokers vs. 126 smokers, a ratio of nearly 7:1  .
+
+```{r}
+nc[is.na(nc$habit),] %>% 
+  kable() %>% 
+  kable_styling(full_width = T) #%>%   
+  #scroll_box(width="1000px",height="150px")
+
+```
+
+#### NB: there is also one case where it is unknown whether the mother was a smoker or not; that observation is excluded from the above plots.   In such case, the weight of the child was low (3.63 lbs) .
+
+The box plots show how the medians of the two distributions compare, but we can
+also compare the means of the distributions using the following function to 
+split the `weight` variable into the `habit` groups, then take the mean of each
+using the `mean` function.
+
+```{r by-means, eval=TRUE}
+by(nc$weight, nc$habit, mean)
+```
+
+There is an observed difference, but is this difference statistically significant? 
+In order to answer this question we will conduct a hypothesis test.
+
+## Inference
+
+3.  Check if the conditions necessary for inference are satisfied. Note that 
+you will need to obtain sample sizes to check the conditions. You can compute 
+the group size using the same `by` command above but replacing `mean` with 
+`length`.
+
+```{r check-sample-size, eval=T}
+samplesize <- by(nc$weight, nc$habit, length)
+samplesize
+```
+
+####There are two conditions necessary to apply the t-distribution to the difference in sample means. 
+
+####(1) Because the data come from a simple random sample and consist of less than 10% of all such cases, the observations are independent. There were 119773 babies born in North Carolina in 2004.  
+(Source:  https://schs.dph.ncdhhs.gov/schs/births/babybook/2004/northcarolina.pdf)     
+
+##### Summary of nonsmoker and smoker:
+```{r summary smoke-nosmoke, eval=T}
+nc %>% drop_na(habit) %>% spread(key = habit, value=weight) %>%  select(nonsmoker,smoker) -> nc_smoke
+summary(nc_smoke)
+```
+
+#### Histograms, one above the other:
+```{r smoke-nosmoke-histograms, eval=T}
+par(mfrow = c(2,1))
+nc_smoke %>% pull(nonsmoker) %>% hist(main="Weights of babies born to mothers who are nonsmokers", breaks=24,xlim=c(0,12),col="lightblue") 
+nc_smoke %>% pull(smoker) %>% hist(main="Weights of babies born to mothers who are smokers", breaks=24,xlim=c(0,12),col="tan")
+```
+
+
+
+
+#### Histograms superimposed on same scale:
+```{r ggplot-histograms-together, eval=T}
+nc %>% drop_na(habit) %>% 
+ggplot(.,aes(x=weight,fill=habit)) + 
+    geom_histogram(binwidth=0.5, center=0.25) +
+    theme_light() + 
+    scale_x_continuous(breaks=seq(0,12, by = 1))+
+    ggtitle("Birth weight of babies born to smoking and nonsmoking mothers")
+```
+
+####While each distribution is strongly left-skewed, the sample sizes of `r samplesize["smoker"]` and `r samplesize["nonsmoker"]` make it reasonable to model each mean separately using a t-distribution. The skew is reasonable for these sample sizes of `r samplesize["smoker"]` and `r samplesize["nonsmoker"]` . 
+
+####(2) The independence reasoning applied above also ensures the observations in each sample are independent. Since both conditions are satisfied, the difference in sample means may be modeled using a t-distribution.
+
+####However, because the sample sizes are substantially larger than 30, and because the t-distribution converges to the Normal distribution for sufficiently large sample sizes, the results from using the Normal distribution will be substantially the same as those from the t-distribution.
+
+4.  Write the hypotheses for testing if the average weights of babies born to 
+smoking and non-smoking mothers are different.
+
+#### **Null Hypothesis**: There is **no** difference in average birth weight for newborns from mothers who did and did not smoke.    
+
+#### In statistical notation: 
+
+$$ H_0 :\quad { \mu  }_{ nonsmoker } = { \mu  }_{ smoker } \quad \Rightarrow \quad { \mu  }_{ nonsmoker } - { \mu  }_{ smoker } = 0$$
+where ${ \mu  }_{ nonsmoker }$ represents the average weight of babies born to non-smoking mothers and ${ \mu  }_{ smoker }$ represents the average weight of babies born to mothers who smoked.   
+
+
+#### **Alternative Hypothesis**: There is **some** difference in average newborn weights from mothers who did and did not smoke:
+
+$$ H_A : :\quad { \mu  }_{ nonsmoker } \ne { \mu  }_{ smoker } \quad \Rightarrow \quad { \mu  }_{ nonsmoker } - { \mu  }_{ smoker } \ne 0$$
+
+
+Next, we introduce a new function, `inference`, that we will use for conducting
+hypothesis tests and constructing confidence intervals. 
+
+```{r inf-weight-habit-ht, eval=TRUE, tidy=FALSE}
+inference(y = nc$weight, x = nc$habit, est = "mean", type = "ht", null = 0, 
+          alternative = "twosided", method = "theoretical")
+```
+
+#### Since the p-value is so low, this gives evidence to **reject the null hypothesis** which conjectured that the mean weights are the same for babies born to smoking and non-smoking mothers.  Thus, we **accept the alternative hypothesis**, which states whether a mother smokes **does** impact the average birth weight.
+
+
+Let's pause for a moment to go through the arguments of this custom function. 
+The first argument is `y`, which is the response variable that we are 
+interested in: `nc$weight`. The second argument is the explanatory variable, 
+`x`, which is the variable that splits the data into two groups, smokers and 
+non-smokers: `nc$habit`. The third argument, `est`, is the parameter we're 
+interested in: `"mean"` (other options are `"median"`, or `"proportion"`.) Next
+we decide on the `type` of inference we want: a hypothesis test (`"ht"`) or a 
+confidence interval (`"ci"`). When performing a hypothesis test, we also need 
+to supply the `null` value, which in this case is `0`, since the null 
+hypothesis sets the two population means equal to each other. The `alternative`
+hypothesis can be `"less"`, `"greater"`, or `"twosided"`. Lastly, the `method` 
+of inference can be `"theoretical"` or `"simulation"` based.
+
+5.  Change the `type` argument to `"ci"` to construct and record a confidence 
+interval for the difference between the weights of babies born to smoking and 
+non-smoking mothers.
+
+```{r inf-weight-habit-ci, eval=TRUE, tidy=FALSE}
+inference(y = nc$weight, x = nc$habit, est = "mean", type = "ci", null = 0, 
+          alternative = "twosided", method = "theoretical")
+```
+
+By default the function reports an interval for ($\mu_{nonsmoker} - \mu_{smoker}$)
+. We can easily change this order by using the `order` argument:
+
+```{r inf-weight-habit-ci2, eval=TRUE, tidy=FALSE}
+inference(y = nc$weight, x = nc$habit, est = "mean", type = "ci", null = 0, 
+          alternative = "twosided", method = "theoretical", 
+          order = c("smoker","nonsmoker"))
+```
+### Conclusion
+####Since the confidence interval **does not include** the null (i.e., zero), this gives evidence to **reject the null hypothesis** which conjectured that the mean weights are the same for babies born to smoking and non-smoking mothers.  Thus, we **accept the alternative** hypothesis, which states that whether a mother smokes **does** impact the average birth weight.
+
+
+* * *
+
+## On your own
+
+### ***(1)   Calculate a 95% confidence interval for the average length of pregnancies 
+(`weeks`) and interpret it in context. Note that since you're doing inference 
+on a single population parameter, there is no explanatory variable, so you can 
+omit the `x` variable from the function.***
+
+
+```{r inf-weeks-preg-ci95, eval=TRUE, tidy=FALSE}
+inference(y = nc$weeks,  est = "mean", type = "ci", null = 0,alternative = "twosided", method = "theoretical")
+```
+#### Because this is a random sample, the observations are independent.  The sample size (998) is large enough to conduct inference using the normal distribution despite the fact that the distribution is left-skewed.     
+#### We are 95% confident that the average length of pregnancies in weeks falls in the interval ( 38.1528 , 38.5165 ) .
+
+
+
+### ***(2)   Calculate a new confidence interval for the same parameter at the 90% 
+confidence level. You can change the confidence level by adding a new argument 
+to the function: `conflevel = 0.90`.***
+
+
+```{r inf-weeks-preg-ci90, eval=TRUE, tidy=FALSE}
+inference(y = nc$weeks,  est = "mean", type = "ci", null = 0, conflevel = 0.90,alternative = "twosided", method = "theoretical")
+```
+
+#### We are 90% confident that the average length of pregnancies, in weeks, falls in the interval ( 38.182 , 38.4873 ) -- which is a **narrower** interval than that associated with  95% confidence above. .
+
+### ***(3)   Conduct a hypothesis test evaluating whether the average weight gained by 
+younger mothers is different than the average weight gained by mature mothers.***
+
+
+#### **Null Hypothesis**: There is **no** difference in average weight gained during pregnancy between younger mothers vs. mature mothers.    
+
+#### In statistical notation: 
+
+$$ H_0 :\quad { \mu  }_{ younger } = { \mu  }_{ mature } \quad \Rightarrow \quad { \mu  }_{ younger } - { \mu  }_{ mature } = 0$$
+where ${ \mu  }_{ younger }$ represents the average weight gained during pregnancy by younger mothers and ${ \mu  }_{ mature }$ represents the average weight gained during pregnancy by mature mothers.   
+
+
+#### **Alternative Hypothesis**: There is **some** difference in average weight gained during pregnancy between younger mothers vs. mature mothers:  
+
+$$ H_0 :\quad { \mu  }_{ younger } \ne { \mu  }_{ mature } \quad \Rightarrow \quad { \mu  }_{ younger } - { \mu  }_{ mature } \ne 0$$
+
+
+```{r inf-weight-gain-ht, eval=TRUE, tidy=FALSE}
+inference(y = nc$gained, x = nc$mature, est = "mean", type = "ht", null = 0, 
+          alternative = "twosided", method = "theoretical")
+```
+
+#### Because the p-value is larger than 0.05, we do not have sufficient evidence to reject the null hypothesis, and conclude that younger and mature mothers, on average, experience similar weight gain during pregnancy.
+
+### ***(4)   Now, a non-inference task: Determine the age cutoff for younger and mature 
+mothers. Use a method of your choice, and explain how your method works.***
+
+
+#### Examine the variables in the nc data set, subsetting between "younger mom" vs. "mature mom" to see what numeric value determines the age cutoff:
+```{r younger-vs-mature, eval=T}
+### Summary of "younger mom" subset:
+nc %>% subset(mature=="younger mom") %>% summary()
+### Summary of "mature mom" subset:
+nc %>% subset(mature=="mature mom") %>% summary()
+
+### summary of "mage" (mother's age) for "younger mom" subset
+summary(nc$mage[nc$mature=="younger mom"])
+maxyounger <- summary(nc$mage[nc$mature=="younger mom"])["Max."]
+cat("**Maximum** age for **younger** moms: ", maxyounger, "\n")
+
+### summary of "mage" (mother's age) for "mature mom" subset
+summary(nc$mage[nc$mature=="mature mom"])
+minmature <- summary(nc$mage[nc$mature=="mature mom"])["Min."]
+cat("**Minimum** age for **mature** moms: ", minmature, "\n")
+```
+
+The distinction is observed when subsetting the dataset into the 133 cases where `mature=="mature mom"` vs. subsetting into the 867 cases where `mature=="younger mom"` .
+By visual inspection of the summary results, "**mature mom**" is associated with those cases where mother's age (mage) is greater than or equal to **`r minmature`**, while "**younger mom**" is associated with those cases where mother's age is less than or equal to **`r maxyounger`**.
+
+### ***(5)   Pick a pair of numerical and categorical variables and come up with a 
+research question evaluating the relationship between these variables. 
+Formulate the question in a way that it can be answered using a hypothesis test
+and/or a confidence interval. Answer your question using the `inference` 
+function, report the statistical results, and also provide an explanation in 
+plain language.***
+
+#### Numerical value:  `visits` : number of hospital visits during pregnancy.  
+
+#### Categorical variable:  `lowbirthweight` : whether baby was classified as low birthweight (`low`) or not (`not low`).
+
+#### Question: Is there a relationship between the **number of hospital visits** made by the mother during pregnancy and **whether the baby is born with "low birth weight"** or not?
+
+
+
+#### **Null Hypothesis**: There is **no** difference between the **average number of hospital visits** during pregnancy by mothers whose babies were **born with low birth weight** vs. the average number of hospital visits during pregnancy by mothers whose babies were **not born with low birth weight**.    
+
+#### In statistical notation: 
+
+$$ H_0 :\quad { \mu  }_{ low } = { \mu  }_{ notlow } \quad \Rightarrow \quad { \mu  }_{ low } - { \mu  }_{ notlow } = 0$$
+where ${ \mu  }_{ low }$ represents the average number of hospital visits during pregnancy by mothers whose babies **were** born with low birth weight and ${ \mu  }_{ notlow }$ represents the average number of hospital visits during pregnancy by mothers whose babies were **not** born with low birth weight.
+
+
+#### **Alternative Hypothesis**: There is **some** difference between the **average number of hospital visits** during pregnancy by mothers whose babies were **born with low birth weight** vs. the average number of hospital visits during pregnancy by mothers whose babies were **not born with low birth weight**. :  
+
+$$ H_0 :\quad { \mu  }_{ low } \ne { \mu  }_{ notlow } \quad \Rightarrow \quad { \mu  }_{ low } - { \mu  }_{ notlow } \ne 0$$
+
+
+#### Summary of the numeric variable:
+```{r}
+summary(nc$visits)
+sd(nc$visits, na.rm = T)
+```
+
+#### The average number of hospital visits by the mother while pregnant was 12.1, with a median value of 12.
+
+
+#### Summary of the categorical variable:
+```{r}
+summary(nc$lowbirthweight)
+```
+
+#### There were 111 babies for whom their birth weight was categorized as "**low**", while 889 were "**not low**."
+
+#### What is the cutoff weight?
+```{r lowbirthweight-cutoff, eval=T}
+### Summary of "low" subset:
+nc %>% subset(lowbirthweight=="low") %>% summary()
+### Summary of "not low" subset:
+nc %>% subset(lowbirthweight=="not low") %>% summary()
+
+### summary of "weight"  for "low" subset
+summary(nc$weight[nc$lowbirthweight=="low"])
+maxlow <- summary(nc$weight[nc$lowbirthweight=="low"])["Max."]
+cat("**Maximum** weight for **low** babies: ", maxlow, "\n")
+
+### summary of "weight"  for "not low" subset
+summary(nc$weight[nc$lowbirthweight=="not low"])
+minnotlow <- summary(nc$weight[nc$lowbirthweight=="not low"])["Min."]
+cat("**Minimum** weight for **not low** babies: ", minnotlow, "\n")
+```
+
+####By visual inspection of the summary results, "**low**" is associated with those cases where the baby's birth weight is less than or equal to **`r maxlow`**, while "**not low**" is associated with those cases where the baby's birth weight is greater than or equal to **`r minnotlow`** .
+
+#### Histogram of number of hospital visits by mother during pregnancy:
+```{r}
+hist(nc$visits, col="lightblue", breaks=31)
+```
+
+
+#### Boxplot of number of prenatal hospital visits vs. low or normal birthweight
+```{r}
+boxplot(nc$visits ~ nc$lowbirthweight, main="Number of mother's prenatal hospital visits vs. baby weight", col=c('red','green'))
+```
+
+#### Histograms one-above-the-other:
+
+```{r}
+nc %>% drop_na(visits) %>% spread(key = lowbirthweight, value=visits) %>%  select(low,`not low`) -> nc_visits
+
+par(mfrow = c(2,1))
+nc_visits %>% pull(low) %>% hist(main="Number of prenatal visits: mothers of low birthweight babies", breaks=31,xlim=c(0,30),col="red") 
+nc_visits %>% pull(`not low`) %>% hist(main="Number of prenatal visits: mothers of normal birthweight babies", breaks=31,xlim=c(0,30),col="green")
+```
+
+#### The number of prenatal visits by each mother are independent, as each case represents a different pregnancy.  The above plots are somewhat normal (they may more closely resemble a normal distribution if the plots showed fewer, wider bands.)  The sample sizes are large enough that we can perform inference assuming a normal distribution, and disregarding the question of skew.
+
+
+```{r inf-visits-marital-ht, eval=TRUE, tidy=FALSE}
+inference(y = nc$visits, x = nc$lowbirthweight, est = "mean", type = "ht", null = 0, 
+          alternative = "twosided", method = "theoretical")
+```
+
+#### The mean number of prenatal visits made by mothers of low-weight babies was **10.7963**, while the mean number of such visits made by mothers of babies for which the weight was `not low` was **12.265** .
+
+#### The observed difference in the average number of prenatal visits,  **-1.4687** , reflects a Z-score of **-3.035** , and yields an extremely small p-value (**.0024**) under the hypothesis test.   
+
+#### This leads us to **reject the null hypothesis**, which stated that there is **no difference** between the number of prenatal hospital visits made by mothers of babies born with low birth weight vs. the number of visits made by mothers of babies who have a greater birth weight.
+
+#### Instead we accept the alternative, which states that there **is a significant difference** between the number of prenatal hospital visits made by mothers of babies born with low birth weight vs. the number of visits made by mothers of babies who have a greater birth weight.
+
+#### Check for 95% confidence interval of difference of means:
+```{r inf-visits-marital-ci, eval=TRUE, tidy=FALSE}
+inference(y = nc$visits, x = nc$lowbirthweight, est = "mean", type = "ci", null = 0, 
+          alternative = "twosided", method = "theoretical")
+```
+
+
+#### With 95% confidence we infer that difference between the average number of prenatal hospital visits made by mothers of low-weight babies vs. the average number of prenatal hospital visits made by mothers of babies with greater birth weight falls in the range ( -2.4173 , -0.5201 ) .
+
+### Conclusion
+
+#### We observe that mothers who give birth to low-weight babies (5.5lbs or less) make, on average, fewer pre-natal hospital visits than do mothers whose babies are born with greater weight.    
+
+#### Of course, this does not imply causation, i.e., we cannot infer that children are born with lower birth weight because their mothers did not make sufficient prenatal hospital visits. 
+
+#### Indeed, there are a number of confounding effects which can be observed from the above summary tables.  
+
+#### In particular, for low-weight babies, average length of the pregnancy was only 33.4 weeks, while the average length was 38.9 weeks for babies of normal weight. Additionally, the low-weight baby set includes a majority of the number of "premies", i.e., prematurely-delivered infants.  Although these variables were not rigorously examined here, the smaller number of prenatal hospital visits by the mother in the case of low-weight babies might be explained by the fact that such babies tend to arrive prematurely, which means there is a shorter time period over which such hospital visits could occur.
+
+
+<div id="license">
+This is a product of OpenIntro that is released under a [Creative Commons 
+Attribution-ShareAlike 3.0 Unported](http://creativecommons.org/licenses/by-sa/3.0).
+This lab was adapted for OpenIntro by Mine &Ccedil;etinkaya-Rundel from a lab 
+written by the faculty and TAs of UCLA Statistics.
+</div>
