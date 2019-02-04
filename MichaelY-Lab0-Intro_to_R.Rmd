@@ -1,11 +1,13 @@
 ---
-title: "Introduction to R and RStudio"
+title: "Lab 0 - Introduction to R and RStudio"
+author: "Michael Y."
+date: "February 3rd, 2019"
 output:
-  pdf_document: default
   html_document:
     css: ./lab.css
     highlight: pygments
     theme: cerulean
+  pdf_document: default
 ---
 
 The goal of this lab is to introduce you to R and RStudio, which you'll be using
@@ -185,7 +187,7 @@ names(girlsslope)<-NULL  # get rid of the name
 girlsslope
 ```
 
-#### The slope of the regression line  is `r round(girlsslope,3)` .
+#### The slope of the overall regression line  is `r round(girlsslope,3)` .
 
 ```{r, eval=TRUE}
 maintitle = paste("The average increase in baptisms is",round(girlsslope,3),"girls per year.")
@@ -320,7 +322,7 @@ source("more/present.R")
 
 The data are stored in a data frame called `present`.
 
--   What years are included in this data set? 
+##1.   What years are included in this data set? 
 ```{r what-years}
 startyear = min(present$year)
 endyear = max(present$year)
@@ -340,42 +342,44 @@ print(text2)
 #### The total number of unique years included in the data set is `r numyears` .
 #### Thus, every year is included from `r startyear` to `r endyear` .
 
--   What are the dimensions of the data frame? 
+##2.   What are the dimensions of the data frame? 
 ```{r dim-present}
 presentdim = dim.data.frame(present)
 presentdim
 ```
 #### The dimensions of the "present" data frame are `r presentdim`  .
--   What are the variable or column names?
+##3.   What are the variable or column names?
 ```{r}
 presentnames = names(present)
+presentnames
 ```
 #### The names of the columns in the "present" data set are: `r presentnames` .
--   How do these counts compare to Arbuthnot's? Are they on a similar scale?
+##4.   How do these counts compare to Arbuthnot's? Are they on a similar scale?
 ```{r}
-avgpresentboys=mean(present$boys)
-#avgpresentboys
-avgpresentgirls=mean(present$girls)
-#avgpresentgirls
-avgarbuthnotboys=mean(arbuthnot$boys)
-#avgarbuthnotboys
-avgarbuthnotgirls=mean(arbuthnot$girls)
-#avgarbuthnotgirls
+avg_presentboys=mean(present$boys)
+#avg_presentboys
+avg_presentgirls=mean(present$girls)
+#avg_presentgirls
+avg_arbuthnotboys=mean(arbuthnot$boys)
+#avg_arbuthnotboys
+avg_arbuthnotgirls=mean(arbuthnot$girls)
+#avg_arbuthnotgirls
 
-ratioboys = avgpresentboys / avgarbuthnotboys
+ratioboys = avg_presentboys / avg_arbuthnotboys
 #ratioboys
-ratiogirls = avgpresentgirls / avgarbuthnotgirls
+ratiogirls = avg_presentgirls / avg_arbuthnotgirls
 #ratiogirls
 ```
-#### The average number of present-day boys is `r round(avgpresentboys,1)` while in Arbuthnot's data it is `r round(avgarbuthnotboys,1)` , for a ratio of `r round(ratioboys,1)`:1 .
-#### The average number of present-day girls is `r round(avgpresentgirls,1)` while in Arbuthnot's data it is `r round(avgarbuthnotgirls,1)`, for a ratio of `r round(ratiogirls,1)`:1 .
+#### The average number of present-day boys is `r round(avg_presentboys,1)` while in Arbuthnot's data it is `r round(avg_arbuthnotboys,1)` , for a ratio of `r round(ratioboys,1)`:1 .
+#### The average number of present-day girls is `r round(avg_presentgirls,1)` while in Arbuthnot's data it is `r round(avg_arbuthnotgirls,1)`, for a ratio of `r round(ratiogirls,1)`:1 .
 #### Thus, the counts are not on a similar scale, as the present-day data is more than 300 times greater than that from Arbuthnot's time.  Of course, a key difference is that the present-day data reflects births in the entire USA (which didn't exist in the 1600s!), while Arbuthnot's data only reflects births in London.
 
--   Make a plot that displays the boy-to-girl ratio for every year in the data 
-    set. What do you see? Does Arbuthnot's observation about boys being born in
-    greater proportion than girls hold up in the U.S.? Include the plot in your 
-    response.
+##5.   Make a plot that displays the boy-to-girl ratio for every year in the data set. 
+## What do you see? Does Arbuthnot's observation about boys being born in greater proportion than girls hold up in the U.S.?
 
+#### As with Arbuthnot's data from London in the 1600s, the present-day data likewise indicates that more boys than girls are born annually in the US, similarly with a trend decreasing toward parity.  Here, there is initially a decrease in the boys-to-girls ratio during the 1940s and 1950s, then an increase during the 1960s, followed by a decrease.
+
+## Include the plot in your response.
 ```{r}
 ratio_boys_girls = present$boys/present$girls
 present_ratio_model <- lm(ratio_boys_girls ~ present$year)
@@ -385,9 +389,9 @@ abline(present_ratio_model,col="blue")
 ```
 
 
-#### As with Arbuthnot's data from London in the 1600s, the present-day data likewise indicates that more boys than girls are born annually in the US, similarly with a trend decreasing toward parity.  Here, there is initially a decrease in the boys-to-girls ratio during the 1940s and 1950s, then an increase during the 1960s, followed by a decrease.
 
--   In what year did we see the most total number of births in the U.S.? 
+
+##6.   In what year did we see the most total number of births in the U.S.? 
 
 ```{r}
 totalUSbirths <- present$boys+present$girls
