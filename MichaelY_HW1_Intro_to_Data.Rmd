@@ -1,13 +1,13 @@
 ---
 title: "HW1-Intro_To_Data"
 author: "Michael Y."
-date: "September 9, 2018"
+date: "February 10, 2019"
 output:
+  pdf_document: default
   html_document:
     css: ./lab.css
     highlight: pygments
     theme: cerulean
-  pdf_document: default
 ---
 
 ```{r setup, include=FALSE}
@@ -18,11 +18,35 @@ setwd("C:/Users/Michael/Dropbox/priv/CUNY/MSDS/201809-Fall/DATA606_Jason/Homewor
 # Homework - Chapter 1 - Intro to Data - 
 ## Exercises 1.8, 1.10, 1.28, 1.36, 1.48, 1.50, 1.56, 1.70   (pp.55-75)
 
+##### Datasets for this chapter:
+
+##### 1.1 - migraine
+##### 1.2 - sinusitis
+##### 1.7 - iris
+#### ***1.8 - smoking***
+##### 1.13 - gss2010
+##### 1.15 - gpa_study_hours
+##### 1.16 - countyComplete
+##### 1.19 - cia_factbook
+##### 1.38 - mammals
+##### 1.49 - cia_factbook
+##### 1.51 - pm25_2011_durham
+##### 1.54 - marathon
+##### 1.61 - [simulated data]
+##### 1.63 - countyComplete
+##### 1.64 - countyComplete
+##### 1.65 - antibiotics_in_children
+##### 1.66 - immigration
+##### 1.67 - dream
+##### 1.68 - ppp_201503
+##### 1.69 - avandia
+#### ***1.70 - heart_transplant***
+
 
 ## Exercise 1.8 - Smoking habits of UK residents. 
 A survey was conducted to study the smoking habits of UK residents. 
 Below is a data matrix displaying a portion of the data collected in this survey.
-Note that "£" stands for British Pounds Sterling, "cig" stands for cigarettes, and "N/A" refers to
+Note that "Â£" stands for British Pounds Sterling, "cig" stands for cigarettes, and "N/A" refers to
 a missing component of the data.
 
 ```{r Q1-smoking-dataset}
@@ -148,9 +172,9 @@ The **sample** in this study is a subset of the children who attended the *CUS (
 
 The findings should **not** be generalized to the population because the specific nature of the children who participated in the experiment is unlikely to be representative of all children.   
 The day camp is comprised of children living in a specific area (Padua, Italy) whose families are presumably able to afford a weekly fee of approximately 100 euros to cover their attendance. (No indication is given as to whether fees are waived in the case of children from poorer families for whom the above fee would be a hardship.)   
-This could result in a biased sample, e.g., by excluding excluding children from poorer families.    
+This could result in a biased sample, e.g., by excluding children from poorer families.    
 Among the children attending the camp, some did not participate in the experiment because their parents did not grant permission.   This could further bias the results, as no indication is given as to the characteristics of those children who were excluded vs. those who participated.   
-While the study might be generalizable to children in *Northern* Italy of similar socioeconomic background as those who participated, further generalization would not be supportable absent repetition of the experiment across diverse locations.  (Indeed, the study may not be generalizable across the whole of Italy, as the large difference in economic performance between wealthy North and the impoverished South is well-known.)
+While the study might be generalizable to children in *Northern* Italy of similar socioeconomic background to those who participated, further generalization would not be supportable absent repetition of the experiment across diverse locations.  (Indeed, the study may not be generalizable across the whole of Italy, as the large difference in economic performance between wealthy North and the impoverished South is well-known.)
 
 Because this is an experiment (rather than an observational study), it **is** appropriate to use the findings of the study to establish causal relationships.  
 Here, the research question is *"Does explicitly telling children not to cheat affect their likelihood to cheat?"*     
@@ -362,7 +386,8 @@ ggplot(heartTr, aes(x=transplant, y=survtime, fill=transplant)) +
 
 ###(c) What proportion of patients in the treatment group and what proportion of patients in the control group died?
 
-In the **treatment** group, **65.2** percent of the patients died, while in the **control** group, **88.2** percent died.    
+In the **treatment** group,  45/69 = **65.2** percent of the patients died, 
+while in the **control** group,  30/34 = **88.2** percent died.    
 Thus, the treatment group exhibited an improvement of **23 percent**.
 
 ###(d) One approach for investigating whether or not the treatment is effective is to use a **randomization technique**.
@@ -394,15 +419,77 @@ If this fraction is ***low***, we conclude that it is unlikely to have observed 
 
 ####iii. What do the simulation results shown below suggest about the effectiveness of the transplant program?
 
-First, the stacking of results in vertical bars above specific points reflect the fact that because of the specific number of participants involved (n=103), with the above counts of alive vs. dead and treatment vs. control, it is not possible to obtain exactly zero as the difference in the proportions.   
-The peak value on the chart corresponds to a simulated result with 19 members of the treatment group alive; the x-value below this bar is $$ \frac{50}{69} - \frac{25}{34} = .7246 - .7352 = -.0107 $$
-There are 19 dots in this column, which indicates that 19 of 100 simulations returned a result with 19 members of the treatment group alive and 50 dead, while 9 members of the control group survived vs. 25 dead.
-Each column to the left represents the simulations where the number of survivors in the treatment group increased by 1, while the number of survivors in the control group was reduced by one.
-Thus, the second-tallest column, containing 18 dots, represents the **18** simulations in which **20** members of the treatment group lived, as did **8** members of the control group.  The difference in proportions (on the x-axis) can be computed as
-$$ \frac{49}{69} - \frac{26}{34} = .7101 - .7647 = -.0546 $$
-Continuing to the left, each bar plot represents the number of simulations where the number of survivors in the treatment group is 21, then 22, then 23, and finally at the leftmost point on the grapn, 24.   
+```{r histo, eval=T}
+#Recreate the histogram from the text
+# confusion matrix - col and row sums
+TotAlive = 28
+TotDead =  75
+TotTreatment = 69
+TotControl = 34
+# simulation results - by counting the number of dots in each column in the textbook historgram
+SimTreatAlive = c(rep(24,2) ,
+                  rep(23,1) ,
+                  rep(22,8) ,
+                  rep(21,15),
+                  rep(20,18),
+                  rep(19,19),
+                  rep(18,12),
+                  rep(17,11),
+                  rep(16,7) ,
+                  rep(15,4) ,
+                  rep(14,3))
+#SimTreatAlive
+SimTreatDead = TotTreatment - SimTreatAlive
+#SimTreatDead
+PercentTreatAlive = SimTreatAlive / TotTreatment
+#PercentTreatAlive
+PercentTreatDead  = SimTreatDead  / TotTreatment
+#PercentTreatDead
 
-This leftmost column reflects the number of simulations in which the count of survivors and deaths in each of the treatment and control groups happens to match the results from the actual study, where 24 members of the treatment group survive, but only 4 members of the control group do.  
+SimControlAlive = TotAlive - SimTreatAlive
+#SimControlAlive
+SimControlDead = TotControl - SimControlAlive
+#SimControlDead
+
+PercentControlAlive = SimControlAlive / TotControl
+#PercentControlAlive
+PercentControlDead  = SimControlDead  / TotControl
+#PercentControlDead
+
+# compute the difference in percent dead, between Treatment and Control, from simulation results
+PercentDeadDiff = PercentTreatDead - PercentControlDead
+# get the unique values for the percentages
+uniq = unique(PercentDeadDiff)
+#uniq
+
+# find out how far apart the above values are, for positioning of breaks
+dif = diff(uniq)
+
+# put the breaks halfway between each value
+breaks = uniq - dif[1]/2
+#breaks
+
+# append one more break on the far right
+breaks[length(breaks)+1]=breaks[length(breaks)]+dif[length(dif)]
+#breaks
+
+# draw the histogram
+hist(x = PercentDeadDiff, breaks = breaks)
+
+```
+
+First, the stacking of results in vertical bars above specific points reflects the fact that because of the specific number of participants involved (n=103), with the above counts of alive vs. dead and treatment vs. control, it is not possible to obtain exactly zero as the difference in the proportions.   
+The peak value on the chart corresponds to a simulated result with 19 members of the treatment group alive; the x-value below this bar is $$ \frac{50}{69} - \frac{25}{34} = .7246 - .7352 = -.0107 $$
+
+There are 19 dots in this column, which indicates that 19 of 100 simulations returned a result with 19 members of the **treatment** group alive and 50 dead, while 9 members of the **control** group survived vs. 25 dead.
+
+Each column to the **left** represents the simulations where the number of **survivors** in the **treatment** group **increased** by 1, while the number of **survivors** in the **control** group was **reduced** by one.
+
+Thus, the second-tallest column, containing 18 dots, represents the **18** simulations in which **20** members of the **treatment** group lived, as did **8** members of the **control** group.  The difference in proportions (on the x-axis) can be computed as
+$$ \frac{49}{69} - \frac{26}{34} = .7101 - .7647 = -.0546 $$
+Continuing to the left, each bar plot represents the number of simulations where the number of survivors in the treatment group is 21, then 22, then 23, and finally at the leftmost point on the graph, **24**.   
+
+This leftmost column reflects the number of simulations in which the count of survivors and deaths in each of the treatment and control groups ***happens to match the results from the actual study***, where **24** members of the **treatment** group survive, but only 4 members of the control group do.  
 
 This corresponds to the difference in proportions computed as 
 $$ \frac{45}{69} - \frac{30}{34} = .6522 - .8824 = -.2302 $$
