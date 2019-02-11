@@ -1,7 +1,7 @@
 ---
 title: "Lab1 - Introduction to data"
 author: "Michael Y."
-date: "September 9th, 2018"
+date: "February 10th, 2019"
 output:
   html_document:
     css: ./lab.css
@@ -533,15 +533,20 @@ boxplot(bmi~cdc$exerany)
 ```{r summary-BMI-exerany}
 
 print("Summary of BMI for individuals who indicate they do not exercise:")
-summary_BMI_no_exercise = summary(bmi[cdc$exerany==0])
+summary_BMI_no_exercise <- summary(bmi[cdc$exerany==0])
 summary_BMI_no_exercise
+median_BMI_no_exercise <- round(summary_BMI_no_exercise["Median"],2)
 
 print("Summary of BMI for individuals who indicate they do exercise:")
-summary_BMI_with_exercise = summary(bmi[cdc$exerany==1])
+summary_BMI_with_exercise <- summary(bmi[cdc$exerany==1])
 summary_BMI_with_exercise
+median_BMI_with_exercise <- round(summary_BMI_with_exercise["Median"],2)
+
+diff_BMI_exercise <- median_BMI_no_exercise - median_BMI_with_exercise
+diff_BMI_exercise
 
 ```
-
+##### This clearly shows that the median BMI for individuals who **do** exercise is `r median_BMI_with_exercise` while the median BMI for individuals who **do not** exercise is `r median_BMI_no_exercise` , for a difference of `r diff_BMI_exercise`  .
 
 ### (end of responses for Exercise 5)
 
@@ -588,14 +593,23 @@ intercept
 plot(x = cdc$weight, y = cdc$wtdesire, main = "Plot of Weight vs. Desired Weight")
 slope = weightmodel$coefficients[2]
 slope
+
+intersection = intercept / (1 - slope)
+intersection
+intersection = round(intersection,3)
+
 abline(weightmodel,col="blue")
 abline(a=0,b=1,col="green")
-intersection = intercept / (1 - slope)
 ```
+
+
 ##### The green line has intercept 0 and slope 1: it represents cases where desired weight = current weight.
-##### Individuals plotted above the green line desire to gain weight, while individuals below the green line desire to lose weight.  There are more points below the green line than above.
-##### The blue line fits a linear regression through the data.  It has slope `r slope` and intersects the green line at ( x , y ) = (`r intersection`,`r intersection`).  
-##### This indicates that, on average, individuals weighing more than `r intersection` desire to lose weight, while individuals weighing less than `r intersection` desire to gain weight.
+##### Individuals plotted **above** the **green** line desire to **gain** weight, while individuals **below** the green line desire to lose **weight**.  
+##### There are more points **below** the green line than **above**, indicating that more individuals wish to **lose** weight rather than **gain**.
+
+##### The **blue** line fits a linear regression through the data.  It has slope `r slope` and intersects the green line at ( x , y ) = (`r intersection`,`r intersection`).  The slope indicates that for each 1 lb. increase in actual weight, the fitted desired weight increases by only `r slope` lbs.
+
+
 
 ##### 
 
