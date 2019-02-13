@@ -24,7 +24,7 @@
 
 
 <style type="text/css">code{white-space: pre;}</style>
-<style type="text/css">
+<style type="text/css" data-origin="pandoc">
 div.sourceCode { overflow-x: auto; }
 table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
   margin: 0; padding: 0; vertical-align: baseline; border: none; }
@@ -60,7 +60,29 @@ code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
 code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
 code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
 code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+
 </style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    for (var j = 0; j < rules.length; j++) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") continue;
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' || rule.style.backgroundColor === '') continue;
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
 <style type="text/css">
   pre:not([class]) {
     background-color: white;
@@ -124,6 +146,9 @@ img {
 button.code-folding-btn:focus {
   outline: none;
 }
+summary {
+  display: list-item;
+}
 </style>
 
 
@@ -131,14 +156,74 @@ button.code-folding-btn:focus {
 <div class="container-fluid main-container">
 
 <!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "";
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
 <script>
 $(document).ready(function () {
   window.buildTabsets("TOC");
 });
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open')
+  });
+});
 </script>
 
 <!-- code folding -->
-
 
 
 
@@ -150,7 +235,7 @@ $(document).ready(function () {
 
 <h1 class="title toc-ignore">Lab2 - Probability</h1>
 <h4 class="author"><em>Michael Y.</em></h4>
-<h4 class="date"><em>September 23rd, 2018</em></h4>
+<h4 class="date"><em>February 17th, 2019</em></h4>
 
 </div>
 
@@ -250,7 +335,7 @@ it is a <strong>miss</strong> which was either:<br />
 ##   streak &lt;- diff(wz) - 1
 ##   return(streak)
 ## }
-## &lt;bytecode: 0x0000000019c9a270&gt;</code></pre>
+## &lt;bytecode: 0x000000001b061518&gt;</code></pre>
 <p>The bug in the above function occurs on the line</p>
 <div id="y---c0y0" class="section level4">
 <h4><code>y &lt;- c(0,y,0)</code></h4>
@@ -311,49 +396,49 @@ it is a <strong>miss</strong> which was either:<br />
 number_of_heads &lt;-<span class="st"> </span><span class="kw">sum</span>(<span class="kw">as.integer</span>(sim_fair_coin<span class="op">==</span><span class="st">&quot;heads&quot;</span>))</code></pre></div>
 <p>To view the results of this simulation, type the name of the object and then use <code>table</code> to count up the number of heads and tails.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">sim_fair_coin</code></pre></div>
-<pre><code>##   [1] &quot;heads&quot; &quot;tails&quot; &quot;heads&quot; &quot;heads&quot; &quot;heads&quot; &quot;heads&quot; &quot;tails&quot; &quot;heads&quot;
-##   [9] &quot;heads&quot; &quot;heads&quot; &quot;tails&quot; &quot;heads&quot; &quot;heads&quot; &quot;heads&quot; &quot;tails&quot; &quot;tails&quot;
-##  [17] &quot;heads&quot; &quot;heads&quot; &quot;heads&quot; &quot;tails&quot; &quot;tails&quot; &quot;tails&quot; &quot;heads&quot; &quot;tails&quot;
-##  [25] &quot;heads&quot; &quot;heads&quot; &quot;heads&quot; &quot;heads&quot; &quot;heads&quot; &quot;heads&quot; &quot;tails&quot; &quot;heads&quot;
-##  [33] &quot;heads&quot; &quot;heads&quot; &quot;heads&quot; &quot;heads&quot; &quot;tails&quot; &quot;heads&quot; &quot;tails&quot; &quot;heads&quot;
-##  [41] &quot;tails&quot; &quot;heads&quot; &quot;heads&quot; &quot;heads&quot; &quot;heads&quot; &quot;tails&quot; &quot;tails&quot; &quot;heads&quot;
-##  [49] &quot;tails&quot; &quot;heads&quot; &quot;tails&quot; &quot;tails&quot; &quot;heads&quot; &quot;tails&quot; &quot;tails&quot; &quot;heads&quot;
-##  [57] &quot;heads&quot; &quot;tails&quot; &quot;tails&quot; &quot;tails&quot; &quot;heads&quot; &quot;heads&quot; &quot;tails&quot; &quot;tails&quot;
-##  [65] &quot;heads&quot; &quot;heads&quot; &quot;tails&quot; &quot;heads&quot; &quot;tails&quot; &quot;tails&quot; &quot;tails&quot; &quot;heads&quot;
-##  [73] &quot;heads&quot; &quot;tails&quot; &quot;tails&quot; &quot;heads&quot; &quot;tails&quot; &quot;heads&quot; &quot;tails&quot; &quot;heads&quot;
-##  [81] &quot;heads&quot; &quot;heads&quot; &quot;heads&quot; &quot;heads&quot; &quot;tails&quot; &quot;heads&quot; &quot;tails&quot; &quot;tails&quot;
-##  [89] &quot;tails&quot; &quot;tails&quot; &quot;heads&quot; &quot;heads&quot; &quot;tails&quot; &quot;tails&quot; &quot;heads&quot; &quot;heads&quot;
-##  [97] &quot;heads&quot; &quot;tails&quot; &quot;tails&quot; &quot;tails&quot;</code></pre>
+<pre><code>##   [1] &quot;tails&quot; &quot;heads&quot; &quot;tails&quot; &quot;tails&quot; &quot;tails&quot; &quot;heads&quot; &quot;heads&quot; &quot;heads&quot;
+##   [9] &quot;heads&quot; &quot;heads&quot; &quot;tails&quot; &quot;tails&quot; &quot;tails&quot; &quot;tails&quot; &quot;tails&quot; &quot;tails&quot;
+##  [17] &quot;tails&quot; &quot;tails&quot; &quot;heads&quot; &quot;tails&quot; &quot;tails&quot; &quot;tails&quot; &quot;heads&quot; &quot;heads&quot;
+##  [25] &quot;tails&quot; &quot;tails&quot; &quot;tails&quot; &quot;tails&quot; &quot;tails&quot; &quot;tails&quot; &quot;tails&quot; &quot;tails&quot;
+##  [33] &quot;heads&quot; &quot;tails&quot; &quot;heads&quot; &quot;tails&quot; &quot;tails&quot; &quot;heads&quot; &quot;heads&quot; &quot;tails&quot;
+##  [41] &quot;heads&quot; &quot;heads&quot; &quot;tails&quot; &quot;heads&quot; &quot;tails&quot; &quot;heads&quot; &quot;heads&quot; &quot;tails&quot;
+##  [49] &quot;heads&quot; &quot;heads&quot; &quot;heads&quot; &quot;heads&quot; &quot;heads&quot; &quot;heads&quot; &quot;tails&quot; &quot;heads&quot;
+##  [57] &quot;tails&quot; &quot;tails&quot; &quot;tails&quot; &quot;heads&quot; &quot;tails&quot; &quot;tails&quot; &quot;heads&quot; &quot;heads&quot;
+##  [65] &quot;tails&quot; &quot;tails&quot; &quot;heads&quot; &quot;tails&quot; &quot;tails&quot; &quot;heads&quot; &quot;tails&quot; &quot;heads&quot;
+##  [73] &quot;tails&quot; &quot;tails&quot; &quot;tails&quot; &quot;tails&quot; &quot;heads&quot; &quot;heads&quot; &quot;tails&quot; &quot;heads&quot;
+##  [81] &quot;tails&quot; &quot;heads&quot; &quot;tails&quot; &quot;tails&quot; &quot;tails&quot; &quot;heads&quot; &quot;heads&quot; &quot;tails&quot;
+##  [89] &quot;heads&quot; &quot;heads&quot; &quot;heads&quot; &quot;heads&quot; &quot;heads&quot; &quot;heads&quot; &quot;heads&quot; &quot;tails&quot;
+##  [97] &quot;tails&quot; &quot;heads&quot; &quot;tails&quot; &quot;heads&quot;</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">table</span>(sim_fair_coin)</code></pre></div>
 <pre><code>## sim_fair_coin
 ## heads tails 
-##    57    43</code></pre>
+##    46    54</code></pre>
 <p>Since there are only two elements in <code>outcomes</code>, the probability that we “flip” a coin and it lands heads is 0.5. Say we’re trying to simulate an unfair coin that we know only lands heads 20% of the time. We can adjust for this by adding an argument called <code>prob</code>, which provides a vector of two probability weights.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">sim_unfair_coin &lt;-<span class="st"> </span><span class="kw">sample</span>(outcomes, <span class="dt">size =</span> <span class="dv">100</span>, <span class="dt">replace =</span> <span class="ot">TRUE</span>, <span class="dt">prob =</span> <span class="kw">c</span>(<span class="fl">0.2</span>, <span class="fl">0.8</span>))
 sim_unfair_coin</code></pre></div>
-<pre><code>##   [1] &quot;tails&quot; &quot;tails&quot; &quot;tails&quot; &quot;tails&quot; &quot;tails&quot; &quot;tails&quot; &quot;tails&quot; &quot;tails&quot;
-##   [9] &quot;tails&quot; &quot;tails&quot; &quot;tails&quot; &quot;tails&quot; &quot;heads&quot; &quot;tails&quot; &quot;tails&quot; &quot;tails&quot;
-##  [17] &quot;tails&quot; &quot;tails&quot; &quot;tails&quot; &quot;tails&quot; &quot;heads&quot; &quot;tails&quot; &quot;tails&quot; &quot;tails&quot;
-##  [25] &quot;tails&quot; &quot;tails&quot; &quot;tails&quot; &quot;tails&quot; &quot;heads&quot; &quot;tails&quot; &quot;tails&quot; &quot;tails&quot;
-##  [33] &quot;tails&quot; &quot;heads&quot; &quot;tails&quot; &quot;tails&quot; &quot;tails&quot; &quot;tails&quot; &quot;heads&quot; &quot;tails&quot;
-##  [41] &quot;tails&quot; &quot;tails&quot; &quot;tails&quot; &quot;heads&quot; &quot;tails&quot; &quot;tails&quot; &quot;tails&quot; &quot;tails&quot;
-##  [49] &quot;tails&quot; &quot;heads&quot; &quot;tails&quot; &quot;tails&quot; &quot;tails&quot; &quot;tails&quot; &quot;heads&quot; &quot;tails&quot;
-##  [57] &quot;tails&quot; &quot;tails&quot; &quot;tails&quot; &quot;tails&quot; &quot;tails&quot; &quot;tails&quot; &quot;heads&quot; &quot;tails&quot;
-##  [65] &quot;heads&quot; &quot;tails&quot; &quot;tails&quot; &quot;tails&quot; &quot;tails&quot; &quot;tails&quot; &quot;heads&quot; &quot;tails&quot;
-##  [73] &quot;tails&quot; &quot;tails&quot; &quot;tails&quot; &quot;tails&quot; &quot;tails&quot; &quot;tails&quot; &quot;tails&quot; &quot;heads&quot;
-##  [81] &quot;tails&quot; &quot;tails&quot; &quot;tails&quot; &quot;tails&quot; &quot;tails&quot; &quot;tails&quot; &quot;heads&quot; &quot;heads&quot;
-##  [89] &quot;tails&quot; &quot;tails&quot; &quot;tails&quot; &quot;heads&quot; &quot;tails&quot; &quot;heads&quot; &quot;heads&quot; &quot;tails&quot;
-##  [97] &quot;tails&quot; &quot;heads&quot; &quot;heads&quot; &quot;tails&quot;</code></pre>
+<pre><code>##   [1] &quot;heads&quot; &quot;tails&quot; &quot;tails&quot; &quot;heads&quot; &quot;tails&quot; &quot;heads&quot; &quot;tails&quot; &quot;tails&quot;
+##   [9] &quot;tails&quot; &quot;tails&quot; &quot;tails&quot; &quot;tails&quot; &quot;tails&quot; &quot;tails&quot; &quot;tails&quot; &quot;tails&quot;
+##  [17] &quot;tails&quot; &quot;tails&quot; &quot;tails&quot; &quot;heads&quot; &quot;tails&quot; &quot;tails&quot; &quot;tails&quot; &quot;tails&quot;
+##  [25] &quot;tails&quot; &quot;tails&quot; &quot;tails&quot; &quot;tails&quot; &quot;tails&quot; &quot;tails&quot; &quot;heads&quot; &quot;tails&quot;
+##  [33] &quot;tails&quot; &quot;tails&quot; &quot;tails&quot; &quot;tails&quot; &quot;heads&quot; &quot;heads&quot; &quot;heads&quot; &quot;tails&quot;
+##  [41] &quot;heads&quot; &quot;tails&quot; &quot;tails&quot; &quot;tails&quot; &quot;tails&quot; &quot;tails&quot; &quot;tails&quot; &quot;tails&quot;
+##  [49] &quot;heads&quot; &quot;tails&quot; &quot;tails&quot; &quot;tails&quot; &quot;tails&quot; &quot;tails&quot; &quot;tails&quot; &quot;tails&quot;
+##  [57] &quot;heads&quot; &quot;tails&quot; &quot;heads&quot; &quot;tails&quot; &quot;heads&quot; &quot;tails&quot; &quot;tails&quot; &quot;tails&quot;
+##  [65] &quot;tails&quot; &quot;tails&quot; &quot;heads&quot; &quot;tails&quot; &quot;tails&quot; &quot;tails&quot; &quot;tails&quot; &quot;heads&quot;
+##  [73] &quot;tails&quot; &quot;heads&quot; &quot;tails&quot; &quot;heads&quot; &quot;heads&quot; &quot;tails&quot; &quot;tails&quot; &quot;heads&quot;
+##  [81] &quot;tails&quot; &quot;tails&quot; &quot;tails&quot; &quot;heads&quot; &quot;tails&quot; &quot;heads&quot; &quot;tails&quot; &quot;tails&quot;
+##  [89] &quot;tails&quot; &quot;heads&quot; &quot;tails&quot; &quot;tails&quot; &quot;tails&quot; &quot;tails&quot; &quot;tails&quot; &quot;heads&quot;
+##  [97] &quot;tails&quot; &quot;tails&quot; &quot;tails&quot; &quot;heads&quot;</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">unfair_number_of_heads &lt;-<span class="st"> </span><span class="kw">sum</span>(<span class="kw">as.integer</span>(sim_unfair_coin<span class="op">==</span><span class="st">&quot;heads&quot;</span>))
 unfair_number_of_heads</code></pre></div>
-<pre><code>## [1] 19</code></pre>
+<pre><code>## [1] 24</code></pre>
 <p><code>prob=c(0.2, 0.8)</code> indicates that for the two elements in the <code>outcomes</code> vector, we want to select the first one, <code>heads</code>, with probability 0.2 and the second one, <code>tails</code> with probability 0.8. Another way of thinking about this is to think of the outcome space as a bag of 10 chips, where 2 chips are labeled “head” and 8 chips “tail”. Therefore at each draw, the probability of drawing a chip that says “head”&quot; is 20%, and “tail” is 80%.</p>
 <ol start="3" style="list-style-type: decimal">
 <li>In your simulation of flipping the unfair coin 100 times, how many flips came up heads?</li>
 </ol>
 <div id="response-to-exercise-3" class="section level4">
 <h4>Response to Exercise 3</h4>
-<p>In the simulation of flipping the unfair coin 100 times, the number of “heads” was <strong><em>19</em></strong> , which is close to the expected result (i.e., <strong>20</strong>, based upon the probability of 0.2 .)</p>
+<p>In the simulation of flipping the unfair coin 100 times, the number of “heads” was <strong><em>24</em></strong> , which is close to the expected result (i.e., <strong>20</strong>, based upon the probability of 0.2 .)</p>
 </div>
 <div id="end-of-response-to-exercise-3" class="section level4">
 <h4>End of Response to Exercise 3</h4>
@@ -377,20 +462,20 @@ sim_basket &lt;-<span class="st"> </span><span class="kw">sample</span>(outcomes
 <p>We need to add <code>prob = c(0.45,0.55)</code> to the *sample** function call:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">sim_basket &lt;-<span class="st"> </span><span class="kw">sample</span>(outcomes, <span class="dt">size =</span> <span class="dv">133</span>, <span class="dt">replace =</span> <span class="ot">TRUE</span>, <span class="dt">prob =</span> <span class="kw">c</span>(<span class="fl">0.45</span>,<span class="fl">0.55</span>))
 sim_basket</code></pre></div>
-<pre><code>##   [1] &quot;H&quot; &quot;H&quot; &quot;M&quot; &quot;M&quot; &quot;H&quot; &quot;M&quot; &quot;H&quot; &quot;M&quot; &quot;M&quot; &quot;H&quot; &quot;H&quot; &quot;H&quot; &quot;M&quot; &quot;M&quot; &quot;M&quot; &quot;M&quot; &quot;M&quot;
-##  [18] &quot;M&quot; &quot;M&quot; &quot;H&quot; &quot;M&quot; &quot;M&quot; &quot;M&quot; &quot;H&quot; &quot;M&quot; &quot;H&quot; &quot;H&quot; &quot;H&quot; &quot;M&quot; &quot;H&quot; &quot;M&quot; &quot;M&quot; &quot;H&quot; &quot;M&quot;
-##  [35] &quot;M&quot; &quot;M&quot; &quot;M&quot; &quot;H&quot; &quot;H&quot; &quot;M&quot; &quot;M&quot; &quot;M&quot; &quot;M&quot; &quot;H&quot; &quot;H&quot; &quot;M&quot; &quot;H&quot; &quot;M&quot; &quot;M&quot; &quot;H&quot; &quot;H&quot;
-##  [52] &quot;H&quot; &quot;M&quot; &quot;M&quot; &quot;H&quot; &quot;M&quot; &quot;M&quot; &quot;H&quot; &quot;M&quot; &quot;H&quot; &quot;M&quot; &quot;H&quot; &quot;H&quot; &quot;M&quot; &quot;M&quot; &quot;H&quot; &quot;M&quot; &quot;H&quot;
-##  [69] &quot;H&quot; &quot;M&quot; &quot;M&quot; &quot;H&quot; &quot;H&quot; &quot;H&quot; &quot;H&quot; &quot;M&quot; &quot;H&quot; &quot;M&quot; &quot;M&quot; &quot;H&quot; &quot;M&quot; &quot;M&quot; &quot;M&quot; &quot;H&quot; &quot;M&quot;
-##  [86] &quot;H&quot; &quot;H&quot; &quot;M&quot; &quot;H&quot; &quot;H&quot; &quot;H&quot; &quot;H&quot; &quot;H&quot; &quot;M&quot; &quot;M&quot; &quot;H&quot; &quot;H&quot; &quot;M&quot; &quot;H&quot; &quot;M&quot; &quot;M&quot; &quot;M&quot;
-## [103] &quot;M&quot; &quot;M&quot; &quot;M&quot; &quot;M&quot; &quot;M&quot; &quot;M&quot; &quot;M&quot; &quot;M&quot; &quot;H&quot; &quot;M&quot; &quot;M&quot; &quot;M&quot; &quot;H&quot; &quot;H&quot; &quot;H&quot; &quot;H&quot; &quot;H&quot;
-## [120] &quot;H&quot; &quot;M&quot; &quot;M&quot; &quot;M&quot; &quot;M&quot; &quot;H&quot; &quot;M&quot; &quot;H&quot; &quot;M&quot; &quot;H&quot; &quot;H&quot; &quot;H&quot; &quot;H&quot; &quot;M&quot;</code></pre>
+<pre><code>##   [1] &quot;H&quot; &quot;M&quot; &quot;M&quot; &quot;H&quot; &quot;M&quot; &quot;H&quot; &quot;H&quot; &quot;H&quot; &quot;H&quot; &quot;M&quot; &quot;M&quot; &quot;H&quot; &quot;M&quot; &quot;H&quot; &quot;M&quot; &quot;H&quot; &quot;M&quot;
+##  [18] &quot;H&quot; &quot;H&quot; &quot;H&quot; &quot;M&quot; &quot;M&quot; &quot;H&quot; &quot;H&quot; &quot;M&quot; &quot;M&quot; &quot;M&quot; &quot;H&quot; &quot;M&quot; &quot;M&quot; &quot;M&quot; &quot;H&quot; &quot;H&quot; &quot;H&quot;
+##  [35] &quot;H&quot; &quot;M&quot; &quot;M&quot; &quot;M&quot; &quot;M&quot; &quot;M&quot; &quot;H&quot; &quot;M&quot; &quot;M&quot; &quot;H&quot; &quot;H&quot; &quot;H&quot; &quot;H&quot; &quot;H&quot; &quot;M&quot; &quot;M&quot; &quot;H&quot;
+##  [52] &quot;H&quot; &quot;M&quot; &quot;M&quot; &quot;H&quot; &quot;H&quot; &quot;H&quot; &quot;H&quot; &quot;M&quot; &quot;H&quot; &quot;M&quot; &quot;H&quot; &quot;H&quot; &quot;H&quot; &quot;M&quot; &quot;M&quot; &quot;M&quot; &quot;M&quot;
+##  [69] &quot;H&quot; &quot;M&quot; &quot;M&quot; &quot;M&quot; &quot;H&quot; &quot;H&quot; &quot;M&quot; &quot;M&quot; &quot;M&quot; &quot;M&quot; &quot;H&quot; &quot;M&quot; &quot;M&quot; &quot;M&quot; &quot;M&quot; &quot;M&quot; &quot;M&quot;
+##  [86] &quot;H&quot; &quot;H&quot; &quot;M&quot; &quot;M&quot; &quot;M&quot; &quot;M&quot; &quot;M&quot; &quot;H&quot; &quot;H&quot; &quot;H&quot; &quot;M&quot; &quot;H&quot; &quot;H&quot; &quot;H&quot; &quot;M&quot; &quot;H&quot; &quot;H&quot;
+## [103] &quot;H&quot; &quot;H&quot; &quot;H&quot; &quot;M&quot; &quot;H&quot; &quot;M&quot; &quot;H&quot; &quot;M&quot; &quot;M&quot; &quot;H&quot; &quot;M&quot; &quot;M&quot; &quot;M&quot; &quot;M&quot; &quot;H&quot; &quot;H&quot; &quot;M&quot;
+## [120] &quot;M&quot; &quot;M&quot; &quot;M&quot; &quot;M&quot; &quot;M&quot; &quot;H&quot; &quot;H&quot; &quot;H&quot; &quot;H&quot; &quot;H&quot; &quot;H&quot; &quot;M&quot; &quot;H&quot; &quot;H&quot;</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">number_of_hit_baskets &lt;-<span class="st"> </span><span class="kw">sum</span>(<span class="kw">as.integer</span>(sim_basket<span class="op">==</span><span class="st">&quot;H&quot;</span>))
 number_of_hit_baskets</code></pre></div>
-<pre><code>## [1] 60</code></pre>
+<pre><code>## [1] 65</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">proportion_of_hit_baskets &lt;-<span class="st"> </span>number_of_hit_baskets<span class="op">/</span><span class="dv">133</span>
 proportion_of_hit_baskets</code></pre></div>
-<pre><code>## [1] 0.4511278</code></pre>
+<pre><code>## [1] 0.4887218</code></pre>
 </div>
 <div id="end-of-response-to-exercise-4" class="section level4">
 <h4>End of response to Exercise 4</h4>
@@ -406,14 +491,14 @@ proportion_of_hit_baskets</code></pre></div>
 ## [103] &quot;H&quot; &quot;M&quot; &quot;M&quot; &quot;M&quot; &quot;H&quot; &quot;M&quot; &quot;H&quot; &quot;H&quot; &quot;H&quot; &quot;M&quot; &quot;H&quot; &quot;H&quot; &quot;H&quot; &quot;M&quot; &quot;H&quot; &quot;M&quot; &quot;H&quot;
 ## [120] &quot;M&quot; &quot;M&quot; &quot;M&quot; &quot;M&quot; &quot;M&quot; &quot;M&quot; &quot;H&quot; &quot;M&quot; &quot;H&quot; &quot;M&quot; &quot;M&quot; &quot;M&quot; &quot;M&quot; &quot;H&quot;</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">sim_basket</code></pre></div>
-<pre><code>##   [1] &quot;H&quot; &quot;H&quot; &quot;M&quot; &quot;M&quot; &quot;H&quot; &quot;M&quot; &quot;H&quot; &quot;M&quot; &quot;M&quot; &quot;H&quot; &quot;H&quot; &quot;H&quot; &quot;M&quot; &quot;M&quot; &quot;M&quot; &quot;M&quot; &quot;M&quot;
-##  [18] &quot;M&quot; &quot;M&quot; &quot;H&quot; &quot;M&quot; &quot;M&quot; &quot;M&quot; &quot;H&quot; &quot;M&quot; &quot;H&quot; &quot;H&quot; &quot;H&quot; &quot;M&quot; &quot;H&quot; &quot;M&quot; &quot;M&quot; &quot;H&quot; &quot;M&quot;
-##  [35] &quot;M&quot; &quot;M&quot; &quot;M&quot; &quot;H&quot; &quot;H&quot; &quot;M&quot; &quot;M&quot; &quot;M&quot; &quot;M&quot; &quot;H&quot; &quot;H&quot; &quot;M&quot; &quot;H&quot; &quot;M&quot; &quot;M&quot; &quot;H&quot; &quot;H&quot;
-##  [52] &quot;H&quot; &quot;M&quot; &quot;M&quot; &quot;H&quot; &quot;M&quot; &quot;M&quot; &quot;H&quot; &quot;M&quot; &quot;H&quot; &quot;M&quot; &quot;H&quot; &quot;H&quot; &quot;M&quot; &quot;M&quot; &quot;H&quot; &quot;M&quot; &quot;H&quot;
-##  [69] &quot;H&quot; &quot;M&quot; &quot;M&quot; &quot;H&quot; &quot;H&quot; &quot;H&quot; &quot;H&quot; &quot;M&quot; &quot;H&quot; &quot;M&quot; &quot;M&quot; &quot;H&quot; &quot;M&quot; &quot;M&quot; &quot;M&quot; &quot;H&quot; &quot;M&quot;
-##  [86] &quot;H&quot; &quot;H&quot; &quot;M&quot; &quot;H&quot; &quot;H&quot; &quot;H&quot; &quot;H&quot; &quot;H&quot; &quot;M&quot; &quot;M&quot; &quot;H&quot; &quot;H&quot; &quot;M&quot; &quot;H&quot; &quot;M&quot; &quot;M&quot; &quot;M&quot;
-## [103] &quot;M&quot; &quot;M&quot; &quot;M&quot; &quot;M&quot; &quot;M&quot; &quot;M&quot; &quot;M&quot; &quot;M&quot; &quot;H&quot; &quot;M&quot; &quot;M&quot; &quot;M&quot; &quot;H&quot; &quot;H&quot; &quot;H&quot; &quot;H&quot; &quot;H&quot;
-## [120] &quot;H&quot; &quot;M&quot; &quot;M&quot; &quot;M&quot; &quot;M&quot; &quot;H&quot; &quot;M&quot; &quot;H&quot; &quot;M&quot; &quot;H&quot; &quot;H&quot; &quot;H&quot; &quot;H&quot; &quot;M&quot;</code></pre>
+<pre><code>##   [1] &quot;H&quot; &quot;M&quot; &quot;M&quot; &quot;H&quot; &quot;M&quot; &quot;H&quot; &quot;H&quot; &quot;H&quot; &quot;H&quot; &quot;M&quot; &quot;M&quot; &quot;H&quot; &quot;M&quot; &quot;H&quot; &quot;M&quot; &quot;H&quot; &quot;M&quot;
+##  [18] &quot;H&quot; &quot;H&quot; &quot;H&quot; &quot;M&quot; &quot;M&quot; &quot;H&quot; &quot;H&quot; &quot;M&quot; &quot;M&quot; &quot;M&quot; &quot;H&quot; &quot;M&quot; &quot;M&quot; &quot;M&quot; &quot;H&quot; &quot;H&quot; &quot;H&quot;
+##  [35] &quot;H&quot; &quot;M&quot; &quot;M&quot; &quot;M&quot; &quot;M&quot; &quot;M&quot; &quot;H&quot; &quot;M&quot; &quot;M&quot; &quot;H&quot; &quot;H&quot; &quot;H&quot; &quot;H&quot; &quot;H&quot; &quot;M&quot; &quot;M&quot; &quot;H&quot;
+##  [52] &quot;H&quot; &quot;M&quot; &quot;M&quot; &quot;H&quot; &quot;H&quot; &quot;H&quot; &quot;H&quot; &quot;M&quot; &quot;H&quot; &quot;M&quot; &quot;H&quot; &quot;H&quot; &quot;H&quot; &quot;M&quot; &quot;M&quot; &quot;M&quot; &quot;M&quot;
+##  [69] &quot;H&quot; &quot;M&quot; &quot;M&quot; &quot;M&quot; &quot;H&quot; &quot;H&quot; &quot;M&quot; &quot;M&quot; &quot;M&quot; &quot;M&quot; &quot;H&quot; &quot;M&quot; &quot;M&quot; &quot;M&quot; &quot;M&quot; &quot;M&quot; &quot;M&quot;
+##  [86] &quot;H&quot; &quot;H&quot; &quot;M&quot; &quot;M&quot; &quot;M&quot; &quot;M&quot; &quot;M&quot; &quot;H&quot; &quot;H&quot; &quot;H&quot; &quot;M&quot; &quot;H&quot; &quot;H&quot; &quot;H&quot; &quot;M&quot; &quot;H&quot; &quot;H&quot;
+## [103] &quot;H&quot; &quot;H&quot; &quot;H&quot; &quot;M&quot; &quot;H&quot; &quot;M&quot; &quot;H&quot; &quot;M&quot; &quot;M&quot; &quot;H&quot; &quot;M&quot; &quot;M&quot; &quot;M&quot; &quot;M&quot; &quot;H&quot; &quot;H&quot; &quot;M&quot;
+## [120] &quot;M&quot; &quot;M&quot; &quot;M&quot; &quot;M&quot; &quot;M&quot; &quot;H&quot; &quot;H&quot; &quot;H&quot; &quot;H&quot; &quot;H&quot; &quot;H&quot; &quot;M&quot; &quot;H&quot; &quot;H&quot;</code></pre>
 <p>Both data sets represent the results of 133 shot attempts, each with the same shooting percentage of 45%. We know that our simulated data is from a shooter that has independent shots. That is, we know the <strong><em>simulated</em></strong> shooter does <strong>not</strong> have a hot hand.</p>
 <hr />
 </div>
@@ -424,8 +509,8 @@ proportion_of_hit_baskets</code></pre></div>
 <h3>Comparing Kobe Bryant to the Independent Shooter</h3>
 <p>Using <code>calc_streak</code>, compute the streak lengths of <code>sim_basket</code>.</p>
 </div>
-<div id="note-as-i-have-established-above-that-calc_streak-contains-a-bug-i-am-instead-going-to-use-my_calc_streak-in-which-i-have-fixed-the-bug." class="section level3">
-<h3>Note: as I have established above that <code>calc_streak</code> contains a bug, I am instead going to use <code>my_calc_streak</code> , in which I have fixed the bug.</h3>
+<div id="note-as-i-have-established-above-that-calc_streak-contains-a-bug-i-am-instead-going-to-use-my_calc_streak-in-which-i-have-fixed-the-bug.-when-running-across-the-entire-sequence-the-difference-is-moot-because-the-final-shot-in-the-list-was-h.-however-their-error-would-become-apparent-if-the-final-shot-were-a-miss." class="section level3">
+<h3>Note: as I have established above that <code>calc_streak</code> contains a bug, I am instead going to use <code>my_calc_streak</code> , in which I have fixed the bug. (When running across the entire sequence, the difference is moot, because the final shot in the list was “H”. However, their error would become apparent if the final shot were a miss.)</h3>
 <div id="kobe-streak-info" class="section level4">
 <h4>Kobe Streak Info</h4>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">kobe<span class="op">$</span>basket</code></pre></div>
@@ -442,12 +527,31 @@ kobe_streak</code></pre></div>
 <pre><code>##  [1] 1 0 2 0 0 0 3 2 0 3 0 1 3 0 0 0 0 0 1 1 0 4 1 0 1 0 1 0 1 2 0 1 2 1 0
 ## [36] 0 1 0 0 0 1 1 0 1 0 2 0 0 0 3 0 1 0 1 2 1 0 1 0 0 1 3 3 1 1 0 0 0 0 0
 ## [71] 1 1 0 0 0 1</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">sum</span>(kobe_streak)</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># total number of baskets</span>
+<span class="kw">sum</span>(kobe_streak)</code></pre></div>
 <pre><code>## [1] 58</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">table</span>(kobe_streak)</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># table of streaks, by length</span>
+<span class="kw">table</span>(kobe_streak)</code></pre></div>
 <pre><code>## kobe_streak
 ##  0  1  2  3  4 
 ## 39 24  6  6  1</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># number of (non-zero) streaks</span>
+kobe_streaks =<span class="st"> </span><span class="kw">sum</span>(<span class="kw">table</span>(kobe_streak)[<span class="op">-</span><span class="dv">1</span>])
+kobe_streaks</code></pre></div>
+<pre><code>## [1] 37</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># total number of baskets on each streak-length</span>
+<span class="kw">as.integer</span>(<span class="kw">names</span>(<span class="kw">table</span>(kobe_streak))) <span class="op">*</span><span class="st"> </span><span class="kw">table</span>(kobe_streak)</code></pre></div>
+<pre><code>## kobe_streak
+##  0  1  2  3  4 
+##  0 24 12 18  4</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># total number of baskets</span>
+kobe_baskets =<span class="st"> </span><span class="kw">sum</span>(<span class="kw">as.integer</span>(<span class="kw">names</span>(<span class="kw">table</span>(kobe_streak))) <span class="op">*</span><span class="st"> </span><span class="kw">table</span>(kobe_streak))
+kobe_baskets</code></pre></div>
+<pre><code>## [1] 58</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># average_streak_length</span>
+kobe_avg_streak =<span class="st"> </span>kobe_baskets <span class="op">/</span><span class="st"> </span>kobe_streaks
+kobe_avg_streak</code></pre></div>
+<pre><code>## [1] 1.567568</code></pre>
 </div>
 <div id="kobe-streak-barplot" class="section level4">
 <h4>Kobe streak barplot</h4>
@@ -457,26 +561,51 @@ kobe_streak</code></pre></div>
 <div id="sim-streak-info" class="section level4">
 <h4>Sim Streak info</h4>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">sim_basket</code></pre></div>
-<pre><code>##   [1] &quot;H&quot; &quot;H&quot; &quot;M&quot; &quot;M&quot; &quot;H&quot; &quot;M&quot; &quot;H&quot; &quot;M&quot; &quot;M&quot; &quot;H&quot; &quot;H&quot; &quot;H&quot; &quot;M&quot; &quot;M&quot; &quot;M&quot; &quot;M&quot; &quot;M&quot;
-##  [18] &quot;M&quot; &quot;M&quot; &quot;H&quot; &quot;M&quot; &quot;M&quot; &quot;M&quot; &quot;H&quot; &quot;M&quot; &quot;H&quot; &quot;H&quot; &quot;H&quot; &quot;M&quot; &quot;H&quot; &quot;M&quot; &quot;M&quot; &quot;H&quot; &quot;M&quot;
-##  [35] &quot;M&quot; &quot;M&quot; &quot;M&quot; &quot;H&quot; &quot;H&quot; &quot;M&quot; &quot;M&quot; &quot;M&quot; &quot;M&quot; &quot;H&quot; &quot;H&quot; &quot;M&quot; &quot;H&quot; &quot;M&quot; &quot;M&quot; &quot;H&quot; &quot;H&quot;
-##  [52] &quot;H&quot; &quot;M&quot; &quot;M&quot; &quot;H&quot; &quot;M&quot; &quot;M&quot; &quot;H&quot; &quot;M&quot; &quot;H&quot; &quot;M&quot; &quot;H&quot; &quot;H&quot; &quot;M&quot; &quot;M&quot; &quot;H&quot; &quot;M&quot; &quot;H&quot;
-##  [69] &quot;H&quot; &quot;M&quot; &quot;M&quot; &quot;H&quot; &quot;H&quot; &quot;H&quot; &quot;H&quot; &quot;M&quot; &quot;H&quot; &quot;M&quot; &quot;M&quot; &quot;H&quot; &quot;M&quot; &quot;M&quot; &quot;M&quot; &quot;H&quot; &quot;M&quot;
-##  [86] &quot;H&quot; &quot;H&quot; &quot;M&quot; &quot;H&quot; &quot;H&quot; &quot;H&quot; &quot;H&quot; &quot;H&quot; &quot;M&quot; &quot;M&quot; &quot;H&quot; &quot;H&quot; &quot;M&quot; &quot;H&quot; &quot;M&quot; &quot;M&quot; &quot;M&quot;
-## [103] &quot;M&quot; &quot;M&quot; &quot;M&quot; &quot;M&quot; &quot;M&quot; &quot;M&quot; &quot;M&quot; &quot;M&quot; &quot;H&quot; &quot;M&quot; &quot;M&quot; &quot;M&quot; &quot;H&quot; &quot;H&quot; &quot;H&quot; &quot;H&quot; &quot;H&quot;
-## [120] &quot;H&quot; &quot;M&quot; &quot;M&quot; &quot;M&quot; &quot;M&quot; &quot;H&quot; &quot;M&quot; &quot;H&quot; &quot;M&quot; &quot;H&quot; &quot;H&quot; &quot;H&quot; &quot;H&quot; &quot;M&quot;</code></pre>
+<pre><code>##   [1] &quot;H&quot; &quot;M&quot; &quot;M&quot; &quot;H&quot; &quot;M&quot; &quot;H&quot; &quot;H&quot; &quot;H&quot; &quot;H&quot; &quot;M&quot; &quot;M&quot; &quot;H&quot; &quot;M&quot; &quot;H&quot; &quot;M&quot; &quot;H&quot; &quot;M&quot;
+##  [18] &quot;H&quot; &quot;H&quot; &quot;H&quot; &quot;M&quot; &quot;M&quot; &quot;H&quot; &quot;H&quot; &quot;M&quot; &quot;M&quot; &quot;M&quot; &quot;H&quot; &quot;M&quot; &quot;M&quot; &quot;M&quot; &quot;H&quot; &quot;H&quot; &quot;H&quot;
+##  [35] &quot;H&quot; &quot;M&quot; &quot;M&quot; &quot;M&quot; &quot;M&quot; &quot;M&quot; &quot;H&quot; &quot;M&quot; &quot;M&quot; &quot;H&quot; &quot;H&quot; &quot;H&quot; &quot;H&quot; &quot;H&quot; &quot;M&quot; &quot;M&quot; &quot;H&quot;
+##  [52] &quot;H&quot; &quot;M&quot; &quot;M&quot; &quot;H&quot; &quot;H&quot; &quot;H&quot; &quot;H&quot; &quot;M&quot; &quot;H&quot; &quot;M&quot; &quot;H&quot; &quot;H&quot; &quot;H&quot; &quot;M&quot; &quot;M&quot; &quot;M&quot; &quot;M&quot;
+##  [69] &quot;H&quot; &quot;M&quot; &quot;M&quot; &quot;M&quot; &quot;H&quot; &quot;H&quot; &quot;M&quot; &quot;M&quot; &quot;M&quot; &quot;M&quot; &quot;H&quot; &quot;M&quot; &quot;M&quot; &quot;M&quot; &quot;M&quot; &quot;M&quot; &quot;M&quot;
+##  [86] &quot;H&quot; &quot;H&quot; &quot;M&quot; &quot;M&quot; &quot;M&quot; &quot;M&quot; &quot;M&quot; &quot;H&quot; &quot;H&quot; &quot;H&quot; &quot;M&quot; &quot;H&quot; &quot;H&quot; &quot;H&quot; &quot;M&quot; &quot;H&quot; &quot;H&quot;
+## [103] &quot;H&quot; &quot;H&quot; &quot;H&quot; &quot;M&quot; &quot;H&quot; &quot;M&quot; &quot;H&quot; &quot;M&quot; &quot;M&quot; &quot;H&quot; &quot;M&quot; &quot;M&quot; &quot;M&quot; &quot;M&quot; &quot;H&quot; &quot;H&quot; &quot;M&quot;
+## [120] &quot;M&quot; &quot;M&quot; &quot;M&quot; &quot;M&quot; &quot;M&quot; &quot;H&quot; &quot;H&quot; &quot;H&quot; &quot;H&quot; &quot;H&quot; &quot;H&quot; &quot;M&quot; &quot;H&quot; &quot;H&quot;</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">sim_streak &lt;-<span class="st"> </span><span class="kw">my_calc_streak</span>(sim_basket)
 <span class="kw">sum</span>(sim_streak)</code></pre></div>
-<pre><code>## [1] 60</code></pre>
+<pre><code>## [1] 65</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">table</span>(sim_streak)</code></pre></div>
 <pre><code>## sim_streak
 ##  0  1  2  3  4  5  6 
-## 41 18  7  3  2  1  1</code></pre>
+## 40 13  6  4  3  2  1</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># total number of baskets</span>
+<span class="kw">sum</span>(sim_streak)</code></pre></div>
+<pre><code>## [1] 65</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># table of streaks, by length</span>
+<span class="kw">table</span>(sim_streak)</code></pre></div>
+<pre><code>## sim_streak
+##  0  1  2  3  4  5  6 
+## 40 13  6  4  3  2  1</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># number of (non-zero) streaks</span>
+sim_streaks =<span class="st"> </span><span class="kw">sum</span>(<span class="kw">table</span>(sim_streak)[<span class="op">-</span><span class="dv">1</span>])
+sim_streaks</code></pre></div>
+<pre><code>## [1] 29</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># total number of baskets on each streak-length</span>
+<span class="kw">as.integer</span>(<span class="kw">names</span>(<span class="kw">table</span>(sim_streak))) <span class="op">*</span><span class="st"> </span><span class="kw">table</span>(sim_streak)</code></pre></div>
+<pre><code>## sim_streak
+##  0  1  2  3  4  5  6 
+##  0 13 12 12 12 10  6</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># total number of baskets</span>
+sim_baskets =<span class="st"> </span><span class="kw">sum</span>(<span class="kw">as.integer</span>(<span class="kw">names</span>(<span class="kw">table</span>(sim_streak))) <span class="op">*</span><span class="st"> </span><span class="kw">table</span>(sim_streak))
+sim_baskets</code></pre></div>
+<pre><code>## [1] 65</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># average_streak_length</span>
+sim_avg_streak =<span class="st"> </span>sim_baskets <span class="op">/</span><span class="st"> </span>sim_streaks
+sim_avg_streak</code></pre></div>
+<pre><code>## [1] 2.241379</code></pre>
 </div>
 <div id="sim-streak-barplot" class="section level4">
 <h4>Sim streak barplot</h4>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">barplot</span>(<span class="kw">table</span>(sim_streak))</code></pre></div>
-<p><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAABUAAAAPACAMAAADDuCPrAAAAxlBMVEUAAAAAADoAAGYAOjoAOmYAOpAAZrY6AAA6OgA6Ojo6OmY6OpA6ZmY6ZpA6ZrY6kNtmAABmOgBmOjpmZjpmZmZmZpBmkLZmkNtmtttmtv+QOgCQOjqQZjqQZmaQkDqQkLaQtraQttuQtv+Q2/+2ZgC2Zjq2kDq2kGa2kLa2tpC2tra2ttu227a229u22/+2//++vr7bkDrbkGbbtmbbtpDbtrbb25Db27bb29vb2//b////tmb/25D/27b/29v//7b//9v///+aBi8lAAAACXBIWXMAAB2HAAAdhwGP5fFlAAAgAElEQVR4nO3dcV+cZZbn4SIdxfR0WtPDZKLj7poVNytu4tLqJi1B8f2/qa2CECqQyaRO34f61c11/TEaPhM4Td3naxU8PCz+AKBkse0BAHaVgAIUCShAkYACFAkoQJGAAhQJKECRgAIUCShAkYACFAkoQJGAAhQJKECRgAIUCShAkYACFAkoQJGAAhQJKECRgAIUCShAkYACFAkoQJGAAhQJKECRgAIUCShAkYACFAkoQJGAAhQJKECRgAIUCShAkYACFAkoQJGAAhQJKECRgAIUCShAkYACFAkoQJGAAhQJKECRgAIUCShAkYACFAkoQJGAAhQJKECRgAIUCShAkYACFAkoQJGAAhQJKECRgAIUCShAkYACFAkoQJGAAhQJKECRgAIUCShAkYACFAkoQJGAAhQJKECRgAIUCShAkYACFAkoQJGAAhQJKECRgAIUCShAkYACFAkoQJGAAhQJKECRgAIUCShAkYACFAkoQJGAAhQJKECRgAIUCShAkYACFAkoQJGAAhQJKECRgAIUCShAkYACFAkoQJGAAhQJKECRgAIUCShAkYACFAkoQJGAAhQJKECRgAIUCShAkYACFAkoQJGAAhQJKECRgAIUCShAkYACFAkoQJGAAhQJKECRgAIUCShAkYACFAkoQJGAAhQJKECRgAIUCShAkYACFAkoQJGAAhQJKECRgAIUCShAkYACFAkoQJGAAhQJKECRgAIUCShAkYACFAkoQJGAAhQJKECRgAIUCShAkYACFAkoQJGAAhQJKECRgAIUCShAkYACFAkoQJGAAhQJKECRgAIUCShAkYACFLUH9OzVL0dHRz+8+rX7AwHc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QAGKBBSgSEABigQUoEhAAYoEFKBIQAGKBBSgSEABigQUoEhAAYoEFKBIQAGKBBSgSEABigQUoEhAAYoEFKBIQAGKBBSgSEABigQUoEhAAYoEFKBIQAGKBBSgSEABigQUoEhAAYoEFKBIQAGKBBSgSEABigQUoEhAAYoEFKBIQAGKBBSgSEABigQUoEhAAYoEFKBIQAGKBBSgSEABigQUoEhAAYoEFKBIQAGKBBSgSEABigQUoEhAAYoEFKBIQAGKBBSgSEABigQUoEhAAYoEFKBIQAGKBBSgSEABigQUoEhAAYoEFKBIQAGKBBSgSEABigQUoEhAAYoEFKBIQAGKBBSgSEABigQUoEhAAYoEFKBIQAGKBBSgSEABigQUoEhAAYoEFKBIQAGKBBSgSEABigQUoEhAAYoEFKBIQAGKBBSgSEABigQUoEhAAYoEFKBIQAGKBBSgSEABigQUoEhAAYoEFKBIQAGKBBSgSGHjzfYAAABBSURBVEABigQUoEhAAYoEFKBIQAGKBBSgSEABigQUoEhAAYoEFKBIQAGKBBSgSEABigQUoEhAAYoEFKBIQAGK/j8Ubu4qrcZH1AAAAABJRU5ErkJggg==" width="672" /></p>
+<p><img src="data:image/png;base64,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" width="672" /></p>
 </div>
 <div id="more-sim-streak-info" class="section level4">
 <h4>More sim streak info</h4>
@@ -484,7 +613,7 @@ kobe_streak</code></pre></div>
 streaktable</code></pre></div>
 <pre><code>## sim_streak
 ##  0  1  2  3  4  5  6 
-## 41 18  7  3  2  1  1</code></pre>
+## 40 13  6  4  3  2  1</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">streakmedian =<span class="st"> </span><span class="kw">median</span>(sim_streak)
 streakmodenamed =<span class="st"> </span>streaktable[streaktable<span class="op">==</span><span class="kw">max</span>(streaktable)]
 streakmode=<span class="kw">names</span>(streakmodenamed)
@@ -492,7 +621,7 @@ streakmode</code></pre></div>
 <pre><code>## [1] &quot;0&quot;</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">streakmodequantity=<span class="kw">as.numeric</span>(streakmodenamed)
 streakmodequantity</code></pre></div>
-<pre><code>## [1] 41</code></pre>
+<pre><code>## [1] 40</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">streakmax =<span class="st"> </span>streaktable[<span class="kw">length</span>(streaktable)]
 streakmaxlength =<span class="st"> </span><span class="kw">names</span>(streakmax)
 streakmaxlength</code></pre></div>
@@ -502,44 +631,44 @@ streakmaxcount</code></pre></div>
 <pre><code>## [1] 1</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">numshots =<span class="st"> </span><span class="kw">sum</span>(sim_streak<span class="op">+</span><span class="dv">1</span>)
 numshots</code></pre></div>
-<pre><code>## [1] 133</code></pre>
+<pre><code>## [1] 134</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">numgood  =<span class="st"> </span><span class="kw">sum</span>(sim_streak)
 numgood</code></pre></div>
-<pre><code>## [1] 60</code></pre>
+<pre><code>## [1] 65</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">pctgood  =<span class="st"> </span>numgood<span class="op">/</span>numshots
 pctgood</code></pre></div>
-<pre><code>## [1] 0.4511278</code></pre>
+<pre><code>## [1] 0.4850746</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">nummissed =<span class="st"> </span><span class="kw">sum</span>(<span class="kw">as.integer</span>(sim_basket<span class="op">==</span><span class="st">&quot;M&quot;</span>))
 nummissed</code></pre></div>
-<pre><code>## [1] 73</code></pre>
+<pre><code>## [1] 68</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">numstreaks =<span class="st"> </span><span class="kw">length</span>(sim_streak)
 numstreaks</code></pre></div>
-<pre><code>## [1] 73</code></pre>
+<pre><code>## [1] 69</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">sim_streak</code></pre></div>
-<pre><code>##  [1] 2 0 1 1 0 3 0 0 0 0 0 0 1 0 0 1 3 1 0 1 0 0 0 2 0 0 0 2 1 0 3 0 1 0 1
-## [36] 1 2 0 1 2 0 4 1 0 1 0 0 1 2 5 0 2 1 0 0 0 0 0 0 0 0 0 0 1 0 0 6 0 0 0
-## [71] 1 1 4</code></pre>
+<pre><code>##  [1] 1 0 1 4 0 1 1 1 3 0 2 0 0 1 0 0 4 0 0 0 0 1 0 5 0 2 0 4 1 3 0 0 0 1 0
+## [36] 0 2 0 0 0 1 0 0 0 0 0 2 0 0 0 0 3 3 5 1 1 0 1 0 0 0 2 0 0 0 0 0 6 2</code></pre>
 </div>
 </div>
 <div id="describe-the-distribution-of-streak-lengths." class="section level3">
 <h3>(1) Describe the distribution of streak lengths.</h3>
-<p>In the above case, the number of successful shots was 60 out of a total of 133 attempts, for a shooting percentage of 0.4511278 . The total number of “streaks” was 73, which reflects 73 misses. The shape of the distribution is right-skewed with most results equal to zero or 1, and few long streaks.</p>
+<p>In the above case, the number of successful shots was 65 out of a total of 134 attempts, for a shooting percentage of 0.4850746 . The total number of “streaks” was 69, which reflects 69 misses. The shape of the distribution is right-skewed with most results equal to zero or 1, and few long streaks.</p>
 <p>For the above simulation, the table of streak lengths is:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">streaktable</code></pre></div>
 <pre><code>## sim_streak
 ##  0  1  2  3  4  5  6 
-## 41 18  7  3  2  1  1</code></pre>
+## 40 13  6  4  3  2  1</code></pre>
 <p>The barplot associated with this streaktable is:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">barplot</span>(streaktable)</code></pre></div>
-<p><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAABUAAAAPACAMAAADDuCPrAAAAxlBMVEUAAAAAADoAAGYAOjoAOmYAOpAAZrY6AAA6OgA6Ojo6OmY6OpA6ZmY6ZpA6ZrY6kNtmAABmOgBmOjpmZjpmZmZmZpBmkLZmkNtmtttmtv+QOgCQOjqQZjqQZmaQkDqQkLaQtraQttuQtv+Q2/+2ZgC2Zjq2kDq2kGa2kLa2tpC2tra2ttu227a229u22/+2//++vr7bkDrbkGbbtmbbtpDbtrbb25Db27bb29vb2//b////tmb/25D/27b/29v//7b//9v///+aBi8lAAAACXBIWXMAAB2HAAAdhwGP5fFlAAAgAElEQVR4nO3dcV+cZZbn4SIdxfR0WtPDZKLj7poVNytu4tLqJi1B8f2/qa2CECqQyaRO34f61c11/TEaPhM4Td3naxU8PCz+AKBkse0BAHaVgAIUCShAkYACFAkoQJGAAhQJKECRgAIUCShAkYACFAkoQJGAAhQJKECRgAIUCShAkYACFAkoQJGAAhQJKECRgAIUCShAkYACFAkoQJGAAhQJKECRgAIUCShAkYACFAkoQJGAAhQJKECRgAIUCShAkYACFAkoQJGAAhQJKECRgAIUCShAkYACFAkoQJGAAhQJKECRgAIUCShAkYACFAkoQJGAAhQJKECRgAIUCShAkYACFAkoQJGAAhQJKECRgAIUCShAkYACFAkoQJGAAhQJKECRgAIUCShAkYACFAkoQJGAAhQJKECRgAIUCShAkYACFAkoQJGAAhQJKECRgAIUCShAkYACFAkoQJGAAhQJKECRgAIUCShAkYACFAkoQJGAAhQJKECRgAIUCShAkYACFAkoQJGAAhQJKECRgAIUCShAkYACFAkoQJGAAhQJKECRgAIUCShAkYACFAkoQJGAAhQJKECRgAIUCShAkYACFAkoQJGAAhQJKECRgAIUCShAkYACFAkoQJGAAhQJKECRgAIUCShAkYACFAkoQJGAAhQJKECRgAIUCShAkYACFAkoQJGAAhQJKECRgAIUCShAkYACFAkoQJGAAhQJKECRgAIUCShAkYACFAkoQJGAAhQJKECRgAIUCShAkYACFAkoQJGAAhQJKECRgAIUCShAkYACFAkoQJGAAhQJKECRgAIUCShAkYACFLUH9OzVL0dHRz+8+rX7AwHc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QAGKBBSgSEABigQUoEhAAYoEFKBIQAGKBBSgSEABigQUoEhAAYoEFKBIQAGKBBSgSEABigQUoEhAAYoEFKBIQAGKBBSgSEABigQUoEhAAYoEFKBIQAGKBBSgSEABigQUoEhAAYoEFKBIQAGKBBSgSEABigQUoEhAAYoEFKBIQAGKBBSgSEABigQUoEhAAYoEFKBIQAGKBBSgSEABigQUoEhAAYoEFKBIQAGKBBSgSEABigQUoEhAAYoEFKBIQAGKBBSgSEABigQUoEhAAYoEFKBIQAGKBBSgSEABigQUoEhAAYoEFKBIQAGKBBSgSEABigQUoEhAAYoEFKBIQAGKBBSgSEABigQUoEhAAYoEFKBIQAGKBBSgSEABigQUoEhAAYoEFKBIQAGKBBSgSEABigQUoEhAAYoEFKBIQAGKBBSgSEABigQUoEhAAYoEFKBIQAGKBBSgSEABigQUoEhAAYoEFKBIQAGKBBSgSGHjzfYAAABBSURBVEABigQUoEhAAYoEFKBIQAGKBBSgSEABigQUoEhAAYoEFKBIQAGKBBSgSEABigQUoEhAAYoEFKBIQAGK/j8Ubu4qrcZH1AAAAABJRU5ErkJggg==" width="672" /></p>
+<p><img src="data:image/png;base64,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" width="672" /></p>
 <div id="what-is-the-typical-streak-length-for-this-simulated-independent-shooter-with-a-45-shooting-percentage" class="section level4">
 <h4>What is the typical streak length for this simulated independent shooter with a 45% shooting percentage?</h4>
-<p>The “typical” streak length was 0, which occured 41 times.<br />
+<p>The “typical” streak length was 0, which occured 40 times.<br />
 The median was 0 , which is expected to be zero, as the shooting percentage used in the simulation is less than 50%.</p>
+<p>Ignoring “streaks” of length zero, the average length of streaks containing one or more baskets was 2.2413793 .</p>
 </div>
 <div id="how-long-is-the-players-longest-streak-of-baskets-in-133-shots" class="section level4">
 <h4>How long is the player’s longest streak of baskets in 133 shots?</h4>
-<p>Because of randomness, the result varies each time I re-knit the r-markdown file. On this run, the longest streak was 6 , which occured 1 times.</p>
+<p>Because of randomness, the result varies each time I re-knit the r-markdown file. On this run, the longest streak was 6 , which occured 1 time(s).</p>
 </div>
 </div>
 <div id="if-you-were-to-run-the-simulation-of-the-independent-shooter-a-second-time-how-would-you-expect-its-streak-distribution-to-compare-to-the-distribution-from-the-question-above" class="section level3">
@@ -571,6 +700,8 @@ The median was 0 , which is expected to be zero, as the shooting percentage used
 <div id="explain." class="section level4">
 <h4>Explain.</h4>
 <p>If Kobe Bryant’s distribution reflected a “hot hand” then his results should reflect significantly <strong>more</strong> <strong><em>long</em></strong> streaks than the number we observe from the simulated shooter, whose streak lengths are random. Kobe’s longest streak was <strong>4</strong> successful shots, and that occurred only <strong>once</strong> . Most random simulations also reflect such streaks, and some even reflect a larger number.</p>
+<p>Disregarding “streaks” of length zero, the average length of Kobe’s “streaks” was 1.5675676,<br />
+while the average for the simulated shooter was 2.2413793 .</p>
 <div id="license">
 <p>This is a product of OpenIntro that is released under a <a href="http://creativecommons.org/licenses/by-sa/3.0">Creative Commons Attribution-ShareAlike 3.0 Unported</a>. This lab was adapted for OpenIntro by Andrew Bray and Mine Çetinkaya-Rundel from a lab written by Mark Hansen of UCLA Statistics.</p>
 </div>

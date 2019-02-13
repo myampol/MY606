@@ -1,7 +1,7 @@
 ---
 title: "Lab2 - Probability"
 author: "Michael Y."
-date: "September 23rd, 2018"
+date: "February 17th, 2019"
 output:
   pdf_document: default
   html_document:
@@ -376,7 +376,7 @@ a hot hand.
 
 Using `calc_streak`, compute the streak lengths of `sim_basket`.
 
-### Note: as I have established above that `calc_streak` contains a bug, I am instead going to use `my_calc_streak` , in which I have fixed the bug.
+### Note: as I have established above that `calc_streak` contains a bug, I am instead going to use `my_calc_streak` , in which I have fixed the bug.  (When running across the entire sequence, the difference is moot, because the final shot in the list was "H".  However, their error would become apparent if the final shot were a miss.)
 
 
 #### Kobe Streak Info
@@ -384,8 +384,21 @@ Using `calc_streak`, compute the streak lengths of `sim_basket`.
 kobe$basket
 kobe_streak <- my_calc_streak(kobe$basket)
 kobe_streak
+# total number of baskets
 sum(kobe_streak)
+# table of streaks, by length
 table(kobe_streak)
+# number of (non-zero) streaks
+kobe_streaks = sum(table(kobe_streak)[-1])
+kobe_streaks
+# total number of baskets on each streak-length
+as.integer(names(table(kobe_streak))) * table(kobe_streak)
+# total number of baskets
+kobe_baskets = sum(as.integer(names(table(kobe_streak))) * table(kobe_streak))
+kobe_baskets
+# average_streak_length
+kobe_avg_streak = kobe_baskets / kobe_streaks
+kobe_avg_streak
 ```
 
 
@@ -401,6 +414,23 @@ sim_basket
 sim_streak <- my_calc_streak(sim_basket)
 sum(sim_streak)
 table(sim_streak)
+
+# total number of baskets
+sum(sim_streak)
+# table of streaks, by length
+table(sim_streak)
+# number of (non-zero) streaks
+sim_streaks = sum(table(sim_streak)[-1])
+sim_streaks
+# total number of baskets on each streak-length
+as.integer(names(table(sim_streak))) * table(sim_streak)
+# total number of baskets
+sim_baskets = sum(as.integer(names(table(sim_streak))) * table(sim_streak))
+sim_baskets
+# average_streak_length
+sim_avg_streak = sim_baskets / sim_streaks
+sim_avg_streak
+
 ```
 
 
@@ -454,12 +484,14 @@ barplot(streaktable)
 ####What is the typical streak length for this simulated independent shooter with a 45% shooting percentage?
 
 The "typical" streak length was `r streakmode`, which occured `r streakmodequantity` times.  
-The median was `r streakmedian` , which is expected to be zero, as the shooting percentage used in the simulation is less than 50%.
+The median was `r streakmedian` , which is expected to be zero, as the shooting percentage used in the simulation is less than 50%.   
+  
+Ignoring "streaks" of length zero, the average length of streaks containing one or more baskets was `r sim_avg_streak` .
 
 ####How long is the player's longest streak of baskets in 133 shots?
 
 Because of randomness, the result varies each time I re-knit the r-markdown file.
-On this run, the longest streak was `r streakmaxlength` , which occured `r streakmaxcount` times.
+On this run, the longest streak was `r streakmaxlength` , which occured `r streakmaxcount` time(s).
 
 
 ###(2) If you were to run the simulation of the independent shooter a second time, how would you expect its streak distribution to compare to the distribution from the question above? 
@@ -492,6 +524,9 @@ No, we do **not** have such evidence.
 ####Explain.
 
 If Kobe Bryant's distribution reflected a "hot hand" then his results should reflect significantly **more** ***long*** streaks than the number we observe from the simulated shooter, whose streak lengths are random. Kobe's longest streak was **4** successful shots, and that occurred only **once** . Most random simulations also reflect such streaks, and some even reflect a larger number.  
+
+Disregarding "streaks" of length zero, the average length of Kobe's "streaks" was `r kobe_avg_streak`,  
+while the average for the simulated shooter was `r sim_avg_streak` .
 
 
 
