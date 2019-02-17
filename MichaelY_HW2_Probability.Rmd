@@ -1,7 +1,7 @@
 ---
 title: "MichaelY_HW2_Probability"
 author: "Michael Y."
-date: "September 23, 2018"
+date: "February 17, 2019"
 output:
   html_document:
     css: ./lab.css
@@ -16,6 +16,15 @@ knitr::opts_chunk$set(echo = TRUE)
 
 # Homework - Chapter 2 - Probability - 
 ## Exercises 2.6, 2.8, 2.20, 2.30, 2.38, 2.44   (pp.116-126)
+
+### Datasets:
+#### 2.14 - health_coverage
+#### 2.17 - global_warming_pew (approximate from poll)
+#### 2.18 - health_coverage
+#### 2.19 - burger
+### **2.20 - assortive_mating**
+#### 2.30 - books
+#### 2.43 - cats
 
 
 ## Exercise 2.6 - Dice rolls.   
@@ -95,14 +104,28 @@ be expected under a random mating pattern. Researchers studying this topic colle
 eye colors of 204 Scandinavian men and their female partners. The table below summarizes the
 results. For simplicity, we only include heterosexual relationships in this exercise.
 
+```{r EX2_20_data, eval=T}
+# load the data supplied by the text
+library(openintro)
+data("assortive.mating")
+# compute a table of counts of pairs
+mytable <- table(assortive.mating)
+mytable
+```
 
 ```{r EX2_20_setup, eval=T}
-eyes=matrix(c(78,23,13,19,23,12,11,9,16),3,3,byrow = T,
+# confirm that I've got the same figures:
+eyes=matrix(c(78,23,13,
+              19,23,12,
+              11,9,16),
+            3,3,byrow = T,
             dimnames = list(c("Male-Blue","Male-Brown","Male-Green"),
                             c("Fem-Blue","Feb-Brown","Fem-Green")))
 eyes
-foo=rbind(eyes,COLSUMS=colSums(eyes))
-bigeyes = cbind(foo,ROWSUMS=rowSums(foo))
+# compute the sums of the columns
+with_colsums=rbind(eyes,COLSUMS=colSums(eyes))
+# compute the sums of the rows
+bigeyes = cbind(with_colsums,ROWSUMS=rowSums(with_colsums))
 bigeyes
 ```
 
@@ -117,20 +140,38 @@ the probability that the male has blue eyes,
 **PLUS** the probability that the female has blue eyes,    
 **MINUS** the probability that BOTH have blue eyes (to prevent double-counting.)    
 
+```{r blue-eyes,eval=T}
+male_blue = sum(mytable["blue",])
+male_blue
+female_blue = sum(mytable[,"blue"])
+female_blue
+both_blue = mytable["blue","blue"]
+both_blue
+total = sum(mytable)
+total
+
+pct_at_least_one_blue = (male_blue + female_blue - both_blue ) / total
+pct_at_least_one_blue
+
+```
+
 $$ \mathbb{P}\left( MaleBlue\vee FemBlue \right)  
 = \mathbb{P}\left( MaleBlue \right) +\mathbb{P}\left( FemBlue \right) -\mathbb{P}\left( MaleBlue\wedge FemBlue \right) 
     \\ 
 = \frac{114}{204}+\frac{108}{204}  -  \frac{78}{204} = \frac{144}{204} 
-=  0.5901$$
+=  0.7059$$
     
-Thus there are 144 pairs, out of the 204 total, where one or more of the members has blue eyes; the ratio is 0.5901.
+Thus there are 144 pairs, out of the 204 total, where one or more of the members has blue eyes; 
+the ratio is `r pct_at_least_one_blue`.
 
 
 ###(b) What is the probability that a randomly chosen male respondent with blue eyes has a partner with blue eyes?   
 
 #### Conditional probability, via Bayes' Rule:
-There are 114 male respondents with **blue** eyes, all are represented across the **top** row of the grid.      
-Randomly choose one of those 114 blue-eyed males; the number of those with a **blue-eyed partner** is 78.    
+There are `r male_blue` male respondents with **blue** eyes, all are represented across the **top** row of the grid.      
+Randomly choose one of those `r male_blue` blue-eyed males; the number of those with a **blue-eyed partner** is `r both_blue` .    
+
+The percentage is `r both_blue/male_blue` .
 
 $$\mathbb{P}\left( FemBlue|MaleBlue \right) * \mathbb{P}\left( MaleBlue \right) 
 = \mathbb{P}\left( MaleBlue\wedge FemBlue \right) $$ 
@@ -142,8 +183,9 @@ $$\mathbb{P}\left( FemBlue|MaleBlue \right)
 
 ###(c) What is the probability that a randomly chosen male respondent with brown eyes has a partner with blue eyes?    
 
-There are 54 male respondents with **brown** eyes, all are represented across the **second** row of the grid.  
-Randomly choose one of those 54 brown-eyed males; the number of those with a blue-eyed partner is 19. 
+There are `r sum(mytable["brown",])` male respondents with **brown** eyes, all are represented across the **second** row of the grid.  
+Randomly choose one of those `r sum(mytable["brown",])` brown-eyed males; the number of those with a blue-eyed partner is `r mytable["brown","blue"]` .
+The probability is `r mytable["brown","blue"] / sum(mytable["brown",])` .
 
 $$\mathbb{P}\left( FemBlue|MaleBrown \right) *\mathbb{P}\left( MaleBrown \right) 
 = \mathbb{P}\left( MaleBrown\wedge FemBlue \right) $$
@@ -155,8 +197,10 @@ $$\mathbb{P}\left( FemBlue|MaleBrown \right)
 
 ###What about the probability of a randomly chosen male respondent with green eyes having a partner with blue eyes?
 
-There are 36 male respondents with **green** eyes, all are represented across the **third** row of the grid.  
-Randomly choose one of those 36 green-eyed males; the number of those with a blue-eyed partner is 11. 
+There are `r sum(mytable["green",])` male respondents with **green** eyes, all are represented across the **third** row of the grid.  
+Randomly choose one of those `r sum(mytable["green",])` green-eyed males; the number of those with a blue-eyed partner is `r mytable["green","blue"]`. 
+
+The probability is `r mytable["green","blue"] / sum(mytable["green",])` .
 
 $$\mathbb{P}\left( FemBlue|MaleGreen \right) *\mathbb{P}\left( MaleGreen \right) 
 = \mathbb{P}\left( MaleGreen\wedge FemBlue \right) $$
@@ -175,15 +219,18 @@ No, the eye colors of male respondents and their partners are not independent.
 If **independent**, then the probabilities would multiply, i.e.,      
      
 $$ \mathbb{P}\left( MaleBlue \right) * \mathbb{P}\left( FemBlue \right) 
-= \mathbb{P}\left( MaleBlue \wedge FemBlue \right) \\
-{ \left( \frac { 114 }{ 204 }  \right)  }*{ \left( \frac { 108 }{ 204 }  \right)  }
+= \mathbb{P}\left( MaleBlue \wedge FemBlue \right) $$
+
+But, we do not have this:
+
+$$ { \left( \frac { 114 }{ 204 }  \right)  }*{ \left( \frac { 108 }{ 204 }  \right)  }
 \neq  { \left( \frac { 78 }{ 204 }  \right)  }  \\
-.5588 * .5284 \neq  .3824 \\
-.2959         \neq  .3824  $$
+.5588 * .5294 \neq  .3824 \\
+.2958         \neq  .3824  $$
 
 
 
-But instead, we have    
+What we do have is:
 
 $$ \mathbb{P}\left( MaleBlue \right) * \mathbb{P}\left( FemBlue|MaleBlue \right) 
 = \mathbb{P}\left( MaleBlue\wedge FemBlue \right) \\
@@ -191,6 +238,8 @@ $$ \mathbb{P}\left( MaleBlue \right) * \mathbb{P}\left( FemBlue|MaleBlue \right)
 =  { \left( \frac { 78 }{ 204 }  \right)  }  \\
 .5588 * .6842 =  .3824 \\
 .3824         =  .3824  $$
+
+This illustrates the conditional dependence.
 
 In order to have independence, the values of the initial matrix would have to be rearranged as follows (keeping the totals in each row and column the same, and ignoring the fact that the results are not integers, thus implying "fractional people") :
 
@@ -227,29 +276,36 @@ changes = bigroundINDEPeyes-bigeyes
 changes
 ```
 
-Under the above adjustments, then we would (approximately) have:
+Looking just at the case of Blue eyes, under the above adjustments, we would (approximately) have:
 
-$$\mathbb{P}\left( FemBlue|MaleBlue \right) * \mathbb{P}\left( MaleBlue \right) 
-= \mathbb{P}\left( MaleBlue\wedge FemBlue \right)  $$
+$$\mathbb{P}\left( FemBlue \right) * \mathbb{P}\left( MaleBlue \right) 
+\approx \mathbb{P}\left( MaleBlue\wedge FemBlue \right)  $$
+$${ \left( \frac { 108 }{ 204 }  \right)  }*{ \left( \frac { 114 }{ 204 }  \right)  }
+\approx  { \left( \frac { 60 }{ 204 }  \right)  }  \\
+.5294 * .5588 \approx  .2941 \\
+.2958         \approx  .2941  $$
+
+This illustrates that, up to the necessary rounding to integer "people", independence of eye-color selection would exist under the above combinations.  (It would have to be demonstrated that the above approximate equality prevailed for every pair, but the above example has been constructed in such a way to force this.)
 
 ## Exercise 2.30 - Books on a bookshelf.    
 The table below shows the distribution of books on a bookcase
 based on whether they are nonfiction or fiction and hardcover or paperback.
+
 ```{r EX2_30_setup, eval=T}
 books=matrix(c(13,59, 15, 8),2,2,byrow = T,
             dimnames = list(c("Fiction","Nonfiction"),
                             c("Hardcover","Paperback")))
 books
-foo=rbind(books,COLSUMS=colSums(books))
-bigbooks = cbind(foo,ROWSUMS=rowSums(foo))
+with_colsums=rbind(books,COLSUMS=colSums(books))
+bigbooks = cbind(with_colsums,ROWSUMS=rowSums(with_colsums))
 bigbooks
 ```
 
-###(a) Find the probability of drawing a **hardcover** book first then a **paperback fiction** book second when drawing **without** replacement.
+###(a) Find the probability of drawing a **hardcover** book first, then a **paperback fiction** book second, when drawing **without** replacement.
 
 The probability of drawing a **hardcover** book first is `r bigbooks[3,1]/bigbooks[3,3]`
 $$\mathbb{P}\left( HardcoverFirst \right) = \left( \frac { 28 }{ 95 }  \right) = .2947$$ 
-We dont know whether the first book drawn was a hardcover fiction book or a hardcover non-fiction book, but it turns out that this does not matter.    
+We don't know whether the first book drawn was a hardcover **fiction** book or a hardcover **non-fiction** book, but it turns out that this does not matter.    
 If the first book drawn was **hardcover fiction**, then the updated shelf is:
 ```{r}
 updatedbooks_aHF = bigbooks + matrix(c(-1,0,-1,0,0,0,-1,0,-1),3,3,byrow = T)
@@ -419,25 +475,104 @@ The relative frequency table below displays the distribution of annual total per
 These data come from the American Community Survey for 2005-2009.     
 This sample is comprised of 59% males and 41% females.    
 
+```{r income, eval=T}
+percents = c(2.2, 4.7, 15.8, 18.3, 21.2, 13.9, 5.8,8.4, 9.7)
+cuts = c(9999,14999,24999,34999,49999,64999,74999,99999,999999)
+
+```
 ###(a) Describe the distribution of total personal income.
 
 It is a right-skewed distribution with a peak in the 35,000 - 50,000 bracket
 
 ###(b) What is the probability that a randomly chosen US resident makes less than $50,000 per year?
 
-62.2 percent
+```{r income+below50k}
+
+low_percents <- percents[cuts<50000]
+low_percents
+cumsum(low_percents)
+prob_below_50k <- sum(low_percents)
+```
+
+The probability that a randomly chosen US resident makes less than $50,000 per year is `r prob_below_50k` percent .
+
+$$\mathbb{P}\left( LowIncome \right) = .622 $$
 
 ###(c) What is the probability that a randomly chosen US resident makes less than $50,000 per year and is female?
 
-Assuming independence of income level vs. gender, the probablility of the above would be 62.2%  * 41% = 25.5%
+$$\mathbb{P}\left( Female \right) = .41 $$
+
+Assuming independence of income level vs. gender, the probablility of the above would be `r prob_below_50k`%  * 41% = `r prob_below_50k * .41`%
+
+$$\mathbb{P}\left( LowIncome \right)*\mathbb{P}\left( Female \right)
+= \mathbb{P}\left( LowIncome \wedge Female \right)\\ 
+= .622 * .41 = .25502 $$
 
 ###Note any assumptions you make.
-This assumes independence.
+This assumes independence of income and gender, i.e., 
+$$\mathbb{P}\left( LowIncome | Female \right)
+= \mathbb{P}\left( LowIncome\right) = .622 $$
 
-###(d) The same data source indicates that 71.8% of females make less than $50,000 per year. Use this value to determine whether or not the assumption you made in part (c) is valid.
+###(d) The same data source indicates that 71.8% of females make less than $50,000 per year. 
+### Use this value to determine whether or not the assumption you made in part (c) is valid.
 
-The above assumed that the 62.2 percent low-income applied to both females and males.
+The above assumed that the `r prob_below_50k`% low-income applied equally to both females and males.
 
-This means that the above assumption of independence is not valid, as the probability of (low income and female) is not equal to (the probability of low income) * (probability of female.)
+This means that the above assumption of independence is not valid, as 
 
-Since the probabilities do not multiply, they are not independent.
+the probability of (low income and female) is not equal to (the probability of low income) * (probability of female.)
+
+$$\mathbb{P}\left( Female \right)*\mathbb{P}\left( LowIncome | Female \right)
+= \mathbb{P}\left( LowIncome \wedge Female \right)\\ 
+= .41 * .718 = .29438 $$
+
+$$\mathbb{P}\left( LowIncome \right)*\mathbb{P}\left( Female \right)
+= \mathbb{P}\left( LowIncome \wedge Female \right)\\ 
+ .622 * .41 = .25502     \ne .29438$$
+Since the probabilities do not multiply, the variables (income and gender) are not independent.
+
+The non-independent scenario described is consistent with the following table, based upon 100,000 people:
+
+```{r income-confusion, eval=T}
+
+income=matrix(c(26238,11562,
+                32762,29438),
+            2,2,byrow = T,
+            dimnames = list(c("Hi_Income","Low_Income"),
+                            c("Male","Female")))
+SumByGender=rbind(income,ByGender=colSums(income))
+income_table = cbind(SumByGender,ByIncome=rowSums(SumByGender))
+income_table
+
+```
+
+Here, the percentage of low-income females is `r as.integer(income_table['Low_Income','Female'])` divided by `r as.integer(income_table['ByGender','Female'])` = `r income_table['Low_Income','Female'] / income_table['ByGender','Female']`, 
+
+while the percentage of low-income males is `r as.integer(income_table['Low_Income','Male'])` divided by `r as.integer(income_table['ByGender','Male'])` = `r income_table['Low_Income','Male'] / income_table['ByGender','Male']`
+
+If the income level were independent of gender, then the distribution would have to be as follows:
+
+```{r income-independent, eval=T}
+
+incomeindep=matrix(c(22302,15498,
+                     36698,25502),
+                     2,2,byrow = T,
+            dimnames = list(c("Hi_Income","Low_Income"),
+                            c("Male","Female")))
+IndepSumByGender=rbind(incomeindep,ByGender=colSums(incomeindep))
+incomeindep_table = cbind(IndepSumByGender,ByIncome=rowSums(IndepSumByGender))
+incomeindep_table
+
+```
+
+Here, the percentage of low-income females would be `r as.integer(incomeindep_table['Low_Income','Female'])` divided by `r as.integer(incomeindep_table['ByGender','Female'])` = `r incomeindep_table['Low_Income','Female'] / incomeindep_table['ByGender','Female']`, 
+
+which matches the percentage of low-income males: `r as.integer(incomeindep_table['Low_Income','Male'])` divided by `r as.integer(incomeindep_table['ByGender','Male'])` = `r incomeindep_table['Low_Income','Male'] / incomeindep_table['ByGender','Male']`
+
+
+Achieving such equalization would require the shifting of nearly 4000 individuals of each gender between income groupings (based upon 100,000 people):
+
+```{r shift-equality,eval=T}
+
+incomeindep - income
+```
