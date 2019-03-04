@@ -1,7 +1,7 @@
 ---
 title: "MichaelY_HW3_Distributions"
 author: "Michael Y."
-date: "October 7, 2018"
+date: "March 3, 2019"
 output:
   html_document:
     css: ./lab.css
@@ -15,7 +15,8 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 ```{r setwd,eval=T}
-setwd("c:/users/Michael/DROPBOX/priv/CUNY/MSDS/201809-Fall/DATA606_Jason/Homework")
+knitr::opts_knit$set(root.dir = "c:/users/Michael/DROPBOX/priv/CUNY/MSDS/201902-Spring/DATA606-Jason/Homework")
+##setwd("c:/users/Michael/DROPBOX/priv/CUNY/MSDS/201902-Spring/DATA606-Jason/Homework")
 ```
 # Homework - Chapter 3 - Distributions - 
 ## Exercises 3.2, 3.4, 3.18, 3.22, 3.38, 3.42   (pp.142-167)
@@ -106,19 +107,19 @@ text(0, .1, pctresultd)
 
 In triathlons, it is common for racers to be placed into age and gender groups.   
 
-Friends Leo and Mary both completed the Hermosa Beach Triathlon, where 
-Leo competed in the Men, Ages 30 - 34 group while    
-Mary competed in the Women, Ages 25 -  29 group.    
-Leo completed the race in 1:22:28 (4948 seconds), while     
-Mary completed the race in 1:31:53 (5513 seconds).    
+Friends Leo and Mary both completed the Hermosa Beach Triathlon, where
+
+• Leo competed in the Men, Ages 30 - 34 group, while    
+• Mary competed in the Women, Ages 25 -  29 group.
+
+• Leo completed the race in 1:22:28 (4948 seconds), while     
+• Mary completed the race in 1:31:53 (5513 seconds).    
 
 Obviously Leo finished faster, but they are curious about how they did within their respective groups. Can you help them?    
 
 Here is some information on the performance of their groups:      
-• The finishing times of the Men, Ages 30 - 34 group has   
-a mean of 4313 seconds with a standard deviation of 583 seconds.   
-• The finishing times of the Women, Ages 25 - 29 group has    
-a mean of 5261 seconds with a standard deviation of 807 seconds.   
+• The finishing times of the Men, Ages 30 - 34 group has a mean of 4313 seconds with a standard deviation of 583 seconds.   
+• The finishing times of the Women, Ages 25 - 29 group has a mean of 5261 seconds with a standard deviation of 807 seconds.   
 • The distributions of finishing times for both groups are approximately Normal.   
 
 Remember: a better performance corresponds to a **faster** finish.
@@ -132,7 +133,7 @@ $$ N_{\text{women}}(\mu=5261, \sigma=807) =\frac { 1 }{ 807 \sqrt { 2\pi  }  } {
 
 ###(b) What are the Z-scores for Leo’s and Mary’s finishing times? 
 
-```{r}
+```{r Prob-3.4.b, eval=T}
 leo_zscore <- (4948-4313)/583
 print(paste("Leo's Z-score is " , leo_zscore))
 mary_zscore <- (5513-5261)/807
@@ -148,7 +149,7 @@ print(paste("Mary's Z-score is " , mary_zscore))
 #### Both Leo and Mary are in the bottom half of their respective groups, as their times are above the respective mean times for their groups.  Because Mary's time is closer to the mean for her group, she ranks better than does Leo, who is closer to the bottom of his respective pack.
 
 ### (d) What percent of the triathletes did Leo finish faster than in his group?
-```{r}
+```{r Prob-3.4.d, eval=T}
 leo_quantile = 1 - pnorm(leo_zscore)
 leo_percentile = round(100*leo_quantile,2)
 
@@ -170,7 +171,7 @@ text(1.6, .05, pctresultleo)
 #### Leo finished faster than only `r leo_percentile`% of his group.
 
 ### (e) What percent of the triathletes did Mary finish faster than in her group?
-```{r}
+```{r Prob-3.4.e, eval=T}
 
 mary_quantile = 1 - pnorm(mary_zscore)
 mary_percentile = round(100*mary_quantile,2)
@@ -209,12 +210,12 @@ Below are heights of 25 female college students:
 
 54, 55, 56, 56, 57, 58, 58, 59, 60, 60, 60, 61, 61, 62, 62, 63, 63, 63, 64, 65, 65, 67, 67, 69, 73
  
- 
+### ***Note:***  The supplied data set "fheights" contains only 24 of the above 25 items -- it omits a repeated value ("65") which is listed in the testbook.  Accordingly the results would not correspond to the values shown in the textbook if the (incorrect) supplied data set is used.  
 
 ### (a) The mean height is 61.52 inches with a standard deviation of 4.58 inches. 
 ### Use this information to determine if the heights approximately follow the  68-95-99.7% Rule.
 
-```{r}
+```{r Prob-3.18.a, eval=T}
 heights = c(54, 55, 56, 56, 57, 58, 58, 59, 60, 60, 60, 61, 61, 62, 62, 63, 63, 63, 64, 65, 65, 67, 67, 69, 73)
 mu = mean(heights)
 sigma = sd(heights)
@@ -253,7 +254,7 @@ print(paste0("Three sd : ", as.character(round(100*sd3pct,3)),"%"))
 ### The production is considered a random process where each transistor is independent of the others.
 
 ### (a) What is the probability that the 10th transistor produced is the first with a defect?
-```{r}
+```{r Prob-3.22.a, eval=T}
 prob_each_defective = 0.02
 prob_each_not_defective = 1 - prob_each_defective
 
@@ -265,7 +266,7 @@ prob_tenth_is_first_defect
 #### The answer is `r prob_tenth_is_first_defect` .
 
 ### (b) What is the probability that the machine produces no defective transistors in a batch of 100?
-```{r}
+```{r Prob-3.22.b, eval=T}
 prob_100_not_defective = prob_each_not_defective^100
 prob_100_not_defective
 ```
@@ -274,12 +275,12 @@ prob_100_not_defective
 
 ### (c) On average, how many transistors would you expect to be produced before the first with a defect? 
 
-```{r}
+```{r Prob-3.22.c, eval=T}
 mu02 = 1 / prob_each_defective
 mu02
 ```
 ###What is the standard deviation?
-```{r}
+```{r Prob-3.22.cc, eval=T}
 sigma02 = sqrt(prob_each_defective*prob_each_not_defective)
 sigma02
 ```
@@ -289,7 +290,7 @@ sigma02
 ### (d) Another machine that also produces transistors has a 5% defective rate where each transistor is produced independent of the others.    
 
 ### On average how many transistors would you expect to be produced with this machine before the first with a defect?   
-```{r}
+```{r Prob-3.22.d, eval=T}
 prob_defective = 0.05
 prob_not_defective = 1 - prob_defective
 mu05 = 1 / prob_defective
@@ -297,7 +298,7 @@ mu05
 ```
 
 ### What is the standard deviation?
-```{r}
+```{r Prob-3.22.dd, eval=T}
 sigma05 = sqrt(prob_defective*prob_not_defective)
 sigma05
 ```
@@ -317,7 +318,7 @@ While it is often assumed that the probabilities of having a boy or a girl are t
 Suppose a couple plans to have 3 kids.
 
 ###(a) Use the binomial model to calculate the probability that two of them will be boys.
-```{r}
+```{r Prob-3.38.a, eval=T}
 p_boy = 0.51
 p_girl = 1- p_boy
 n = 3
@@ -337,7 +338,7 @@ p_two_boys_of_three
 
 ###Use these scenarios to calculate the same probability from part (a) but using the addition rule for disjoint outcomes.
 
-```{r}
+```{r Prob-3.38.b, eval=T}
 p_girl_first = p_girl * p_boy * p_boy
 p_girl_middle = p_boy * p_girl * p_boy
 p_girl_last = p_boy * p_boy * p_girl
@@ -349,7 +350,7 @@ p_sum
 #### The answer is `r p_sum` .
 
 ### Confirm that your answers from parts (a) and (b) match.
-```{r}
+```{r Prob-3.38.bb, eval=T}
 p_two_boys_of_three ==  p_sum
 ```
 
@@ -357,11 +358,12 @@ p_two_boys_of_three ==  p_sum
 
 
 ###(c) If we wanted to calculate the probability that a couple who plans to have 8 kids will have 3 boys, briefly describe why the approach from part (b) would be more tedious than the approach from part (a).
-```{r}
+```{r Prob-3.38.c, eval=T}
 choose(8,3)
 ```
 
-#### The approach from part (b) would require evaluation of `r choose(8,3)` cases, which would be quite tedious.  Part (a) would simply follow the binomial formula.
+#### The approach from part (b) would require evaluation of `r choose(8,3)` cases, which would be quite tedious.  
+#### Part (a) would simply follow the binomial formula.
 
 
 ##########################################################################
@@ -377,19 +379,24 @@ Suppose that her serves are independent of each other.
 
 #### This scenario means that she has to make 2 successful serves out of the first 9 attempts, then she has to have a success on the 10th attempt for her third overall success.
 
-```{r}
+```{r Prob-3.42.a, eval=T}
 p_success = .15
 p_fail = 1 - p_success
 n = 9
 k = 2
 p_two_of_nine_successes = choose(n,k) * p_success^k * p_fail^(n-k)
 p_two_of_nine_successes
+### dbinom:
+dbinom(x = 2, size = 9, prob = .15)
 
 p_third_success_on_tenth_trial = p_two_of_nine_successes * p_success
 p_third_success_on_tenth_trial
+### dnbinom (Negative Binomial):
+dnbinom(x = 10-3, size = 3, prob = .15)
 ```
 
 #### The answer is `r p_third_success_on_tenth_trial` .  
+#### This illustrates the Negative Binomial distribution  (where above we have already subtracted 1 from each of n and k.)
 
 
 ### (b) Suppose she has made two successful serves in nine attempts. What is the probability that her 10th serve will be successful?
@@ -400,4 +407,6 @@ p_third_success_on_tenth_trial
 ### (c) Even though parts (a) and (b) discuss the same scenario, the probabilities you calculated should be different. Can you explain the reason for this discrepancy?
 
 #### In part (a), we don't yet know when she would have successes or failures on her serves.  After the first 9 serves, she has only a `r p_two_of_nine_successes` of having had exactly two successful serves.  She might have more than two, or fewer than two.  If she does not have exactly two successes in the first nine trials, then the outcome of the 10th serve is irrelevant for this event, because it cannot be her third success.    
-#### On the other hand, in part (b), we already know that she has had the requisite 2 successes in the first 9 serves.  Because of the assumed independence of success on each individual serve, the probability that her next serve could be thr third success is the same as the probability that any individual serve is successful.
+
+#### On the other hand, in part (b), we already know that she has had the requisite 2 successes in the first 9 serves.  Because of the assumed independence of success on each individual serve, the probability that her next serve could be the third success is the same as the probability that any individual serve is successful.
+

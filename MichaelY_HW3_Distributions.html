@@ -24,7 +24,7 @@
 
 
 <style type="text/css">code{white-space: pre;}</style>
-<style type="text/css">
+<style type="text/css" data-origin="pandoc">
 div.sourceCode { overflow-x: auto; }
 table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
   margin: 0; padding: 0; vertical-align: baseline; border: none; }
@@ -60,7 +60,29 @@ code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
 code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
 code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
 code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+
 </style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    for (var j = 0; j < rules.length; j++) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") continue;
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' || rule.style.backgroundColor === '') continue;
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
 <style type="text/css">
   pre:not([class]) {
     background-color: white;
@@ -124,6 +146,9 @@ img {
 button.code-folding-btn:focus {
   outline: none;
 }
+summary {
+  display: list-item;
+}
 </style>
 
 
@@ -131,14 +156,74 @@ button.code-folding-btn:focus {
 <div class="container-fluid main-container">
 
 <!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "";
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
 <script>
 $(document).ready(function () {
   window.buildTabsets("TOC");
 });
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open')
+  });
+});
 </script>
 
 <!-- code folding -->
-
 
 
 
@@ -150,12 +235,13 @@ $(document).ready(function () {
 
 <h1 class="title toc-ignore">MichaelY_HW3_Distributions</h1>
 <h4 class="author"><em>Michael Y.</em></h4>
-<h4 class="date"><em>October 7, 2018</em></h4>
+<h4 class="date"><em>March 3, 2019</em></h4>
 
 </div>
 
 
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">setwd</span>(<span class="st">&quot;c:/users/Michael/DROPBOX/priv/CUNY/MSDS/201809-Fall/DATA606_Jason/Homework&quot;</span>)</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">knitr<span class="op">::</span>opts_knit<span class="op">$</span><span class="kw">set</span>(<span class="dt">root.dir =</span> <span class="st">&quot;c:/users/Michael/DROPBOX/priv/CUNY/MSDS/201902-Spring/DATA606-Jason/Homework&quot;</span>)
+##setwd(&quot;c:/users/Michael/DROPBOX/priv/CUNY/MSDS/201902-Spring/DATA606-Jason/Homework&quot;)</code></pre></div>
 <div id="homework---chapter-3---distributions--" class="section level1">
 <h1>Homework - Chapter 3 - Distributions -</h1>
 <div id="exercises-3.2-3.4-3.18-3.22-3.38-3.42-pp.142-167" class="section level2">
@@ -201,16 +287,15 @@ $(document).ready(function () {
 <div id="exercise-3.4-triathlon-times-part-i." class="section level2">
 <h2>Exercise 3.4 Triathlon times, Part I.</h2>
 <p>In triathlons, it is common for racers to be placed into age and gender groups.</p>
-<p>Friends Leo and Mary both completed the Hermosa Beach Triathlon, where Leo competed in the Men, Ages 30 - 34 group while<br />
-Mary competed in the Women, Ages 25 - 29 group.<br />
-Leo completed the race in 1:22:28 (4948 seconds), while<br />
-Mary completed the race in 1:31:53 (5513 seconds).</p>
+<p>Friends Leo and Mary both completed the Hermosa Beach Triathlon, where</p>
+<p>• Leo competed in the Men, Ages 30 - 34 group, while<br />
+• Mary competed in the Women, Ages 25 - 29 group.</p>
+<p>• Leo completed the race in 1:22:28 (4948 seconds), while<br />
+• Mary completed the race in 1:31:53 (5513 seconds).</p>
 <p>Obviously Leo finished faster, but they are curious about how they did within their respective groups. Can you help them?</p>
 <p>Here is some information on the performance of their groups:<br />
-• The finishing times of the Men, Ages 30 - 34 group has<br />
-a mean of 4313 seconds with a standard deviation of 583 seconds.<br />
-• The finishing times of the Women, Ages 25 - 29 group has<br />
-a mean of 5261 seconds with a standard deviation of 807 seconds.<br />
+• The finishing times of the Men, Ages 30 - 34 group has a mean of 4313 seconds with a standard deviation of 583 seconds.<br />
+• The finishing times of the Women, Ages 25 - 29 group has a mean of 5261 seconds with a standard deviation of 807 seconds.<br />
 • The distributions of finishing times for both groups are approximately Normal.</p>
 <p>Remember: a better performance corresponds to a <strong>faster</strong> finish.</p>
 <div id="a-write-down-the-short-hand-for-these-two-normal-distributions." class="section level3">
@@ -306,6 +391,9 @@ i &lt;-<span class="st"> </span>x <span class="op">&gt;=</span><span class="st">
 <h2>Exercise 3.18 Heights of female college students.</h2>
 <p>Below are heights of 25 female college students:</p>
 <p>54, 55, 56, 56, 57, 58, 58, 59, 60, 60, 60, 61, 61, 62, 62, 63, 63, 63, 64, 65, 65, 67, 67, 69, 73</p>
+<div id="note-the-supplied-data-set-fheights-contains-only-24-of-the-above-25-items-it-omits-a-repeated-value-65-which-is-listed-in-the-testbook.-accordingly-the-results-would-not-correspond-to-the-values-shown-in-the-textbook-if-the-incorrect-supplied-data-set-is-used." class="section level3">
+<h3><strong><em>Note:</em></strong> The supplied data set “fheights” contains only 24 of the above 25 items – it omits a repeated value (“65”) which is listed in the testbook. Accordingly the results would not correspond to the values shown in the textbook if the (incorrect) supplied data set is used.</h3>
+</div>
 <div id="a-the-mean-height-is-61.52-inches-with-a-standard-deviation-of-4.58-inches." class="section level3">
 <h3>(a) The mean height is 61.52 inches with a standard deviation of 4.58 inches.</h3>
 </div>
@@ -486,8 +574,11 @@ p_sum</code></pre></div>
 <h3>(c) If we wanted to calculate the probability that a couple who plans to have 8 kids will have 3 boys, briefly describe why the approach from part (b) would be more tedious than the approach from part (a).</h3>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">choose</span>(<span class="dv">8</span>,<span class="dv">3</span>)</code></pre></div>
 <pre><code>## [1] 56</code></pre>
-<div id="the-approach-from-part-b-would-require-evaluation-of-56-cases-which-would-be-quite-tedious.-part-a-would-simply-follow-the-binomial-formula." class="section level4">
-<h4>The approach from part (b) would require evaluation of 56 cases, which would be quite tedious. Part (a) would simply follow the binomial formula.</h4>
+<div id="the-approach-from-part-b-would-require-evaluation-of-56-cases-which-would-be-quite-tedious." class="section level4">
+<h4>The approach from part (b) would require evaluation of 56 cases, which would be quite tedious.</h4>
+</div>
+<div id="part-a-would-simply-follow-the-binomial-formula." class="section level4">
+<h4>Part (a) would simply follow the binomial formula.</h4>
 <div id="section-4" class="section level74">
 <p></p>
 </div>
@@ -509,12 +600,21 @@ k =<span class="st"> </span><span class="dv">2</span>
 p_two_of_nine_successes =<span class="st"> </span><span class="kw">choose</span>(n,k) <span class="op">*</span><span class="st"> </span>p_success<span class="op">^</span>k <span class="op">*</span><span class="st"> </span>p_fail<span class="op">^</span>(n<span class="op">-</span>k)
 p_two_of_nine_successes</code></pre></div>
 <pre><code>## [1] 0.2596674</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">### dbinom:
+<span class="kw">dbinom</span>(<span class="dt">x =</span> <span class="dv">2</span>, <span class="dt">size =</span> <span class="dv">9</span>, <span class="dt">prob =</span> .<span class="dv">15</span>)</code></pre></div>
+<pre><code>## [1] 0.2596674</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">p_third_success_on_tenth_trial =<span class="st"> </span>p_two_of_nine_successes <span class="op">*</span><span class="st"> </span>p_success
 p_third_success_on_tenth_trial</code></pre></div>
+<pre><code>## [1] 0.03895012</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">### dnbinom (Negative Binomial):
+<span class="kw">dnbinom</span>(<span class="dt">x =</span> <span class="dv">10</span><span class="op">-</span><span class="dv">3</span>, <span class="dt">size =</span> <span class="dv">3</span>, <span class="dt">prob =</span> .<span class="dv">15</span>)</code></pre></div>
 <pre><code>## [1] 0.03895012</code></pre>
 </div>
 <div id="the-answer-is-0.0389501-." class="section level4">
 <h4>The answer is 0.0389501 .</h4>
+</div>
+<div id="this-illustrates-the-negative-binomial-distribution-where-above-we-have-already-subtracted-1-from-each-of-n-and-k." class="section level4">
+<h4>This illustrates the Negative Binomial distribution (where above we have already subtracted 1 from each of n and k.)</h4>
 </div>
 </div>
 <div id="b-suppose-she-has-made-two-successful-serves-in-nine-attempts.-what-is-the-probability-that-her-10th-serve-will-be-successful" class="section level3">
@@ -528,8 +628,8 @@ p_third_success_on_tenth_trial</code></pre></div>
 <div id="in-part-a-we-dont-yet-know-when-she-would-have-successes-or-failures-on-her-serves.-after-the-first-9-serves-she-has-only-a-0.2596674-of-having-had-exactly-two-successful-serves.-she-might-have-more-than-two-or-fewer-than-two.-if-she-does-not-have-exactly-two-successes-in-the-first-nine-trials-then-the-outcome-of-the-10th-serve-is-irrelevant-for-this-event-because-it-cannot-be-her-third-success." class="section level4">
 <h4>In part (a), we don’t yet know when she would have successes or failures on her serves. After the first 9 serves, she has only a 0.2596674 of having had exactly two successful serves. She might have more than two, or fewer than two. If she does not have exactly two successes in the first nine trials, then the outcome of the 10th serve is irrelevant for this event, because it cannot be her third success.</h4>
 </div>
-<div id="on-the-other-hand-in-part-b-we-already-know-that-she-has-had-the-requisite-2-successes-in-the-first-9-serves.-because-of-the-assumed-independence-of-success-on-each-individual-serve-the-probability-that-her-next-serve-could-be-thr-third-success-is-the-same-as-the-probability-that-any-individual-serve-is-successful." class="section level4">
-<h4>On the other hand, in part (b), we already know that she has had the requisite 2 successes in the first 9 serves. Because of the assumed independence of success on each individual serve, the probability that her next serve could be thr third success is the same as the probability that any individual serve is successful.</h4>
+<div id="on-the-other-hand-in-part-b-we-already-know-that-she-has-had-the-requisite-2-successes-in-the-first-9-serves.-because-of-the-assumed-independence-of-success-on-each-individual-serve-the-probability-that-her-next-serve-could-be-the-third-success-is-the-same-as-the-probability-that-any-individual-serve-is-successful." class="section level4">
+<h4>On the other hand, in part (b), we already know that she has had the requisite 2 successes in the first 9 serves. Because of the assumed independence of success on each individual serve, the probability that her next serve could be the third success is the same as the probability that any individual serve is successful.</h4>
 </div>
 </div>
 </div>
