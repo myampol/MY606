@@ -1,13 +1,13 @@
 ---
 title: "Lab3 - The normal distribution"
 author: "Michael Y."
-date: "October 7th, 2018"
+date: "March 3rd, 2019"
 output:
-  pdf_document: default
   html_document:
     css: ./lab.css
     highlight: pygments
     theme: cerulean
+  pdf_document: default
 ---
 
 
@@ -17,7 +17,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 
 ```{r setwd,eval=T}
-setwd("c:/users/Michael/DROPBOX/priv/CUNY/MSDS/201809-Fall/DATA606_Jason/Labs/Lab3")
+setwd("c:/users/Michael/DROPBOX/priv/CUNY/MSDS/201902-Spring/DATA606-Jason/Labs/Lab3")
 ```
 
 In this lab we'll investigate the probability distribution that is most central
@@ -418,9 +418,4 @@ lines(x = x, y = y, col = "blue")
 
 ![histQQmatch](more/histQQmatch.png)
 
-<div id="license">
-This is a product of OpenIntro that is released under a 
-[Creative Commons Attribution-ShareAlike 3.0 Unported](http://creativecommons.org/licenses/by-sa/3.0). 
-This lab was adapted for OpenIntro by Andrew Bray and Mine &Ccedil;etinkaya-Rundel
-from a lab written by Mark Hansen of UCLA Statistics.
-</div>
+
