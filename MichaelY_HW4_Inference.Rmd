@@ -1,13 +1,13 @@
 ---
 title: "MichaelY_HW4_Inference"
 author: "Michael Y."
-date: "October 21, 2018"
+date: "March 17th, 2019"
 output:
-  pdf_document: default
   html_document:
     css: ./lab.css
     highlight: pygments
     theme: cerulean
+  pdf_document: default
 ---
 
 ```{r setup, include=FALSE}
@@ -16,11 +16,20 @@ library(DATA606)
 ```
 
 ```{r setwd,eval=T}
-setwd("c:/users/Michael/DROPBOX/priv/CUNY/MSDS/201809-Fall/DATA606_Jason/Homework")
+knitr::opts_knit$set(root.dir = "c:/users/Michael/DROPBOX/priv/CUNY/MSDS/201902-Spring/DATA606-Jason/Homework")
+##setwd("c:/users/Michael/DROPBOX/priv/CUNY/MSDS/201902-Spring/DATA606-Jason/Homework")
 ```
 # Homework - Chapter 4 - Foundations for Inference (pp.168-218)
 
 ### Exercises: 4.4, 4.14, 4.24, 4.26, 4.34, 4.40, 4.48 (pp.203-218)
+
+#### Datasets
+#### 4.4 - bdims
+#### 4.14 - thanksgiving_spend
+#### 4.24 - gifted
+#### 4.26 - gifted
+
+
 
 ## Exercise 4.4 - Heights of adults. 
 
@@ -28,15 +37,21 @@ setwd("c:/users/Michael/DROPBOX/priv/CUNY/MSDS/201809-Fall/DATA606_Jason/Homewor
 ### {G. Heinz et al. “Exploring relationships in body dimensions”. In: Journal of Statistics Education 11.2 (2003).}
 
 ```{r prob4.4, eval=T}
-p44_Min = 147.2
-p44_Q1  = 163.8
-p44_Median = 170.3
-p44_Mean = 171.1
-p44_SD  = 9.4
-p44_Q3  = 177.8
-p44_Max = 198.1
+data(bdims)
+height = bdims$hgt
+hist(height,breaks=11,col="blue")
+s=summary(height)
+s
 
-p44_N = 507
+p44_Min = s[1]      # 147.2
+p44_Q1  = s[2]      # 163.8
+p44_Median = s[3]   # 170.3
+p44_Mean = s[4]     # 171.1438
+p44_SD  = sd(height)  # 9.407205
+p44_Q3  = s[5]      # 177.8
+p44_Max = s[6]      # 198.1
+
+p44_N = length(height)  # 507
 ```
 
 
@@ -114,7 +129,7 @@ data(tgSpending)
 str(tgSpending)
 summary(tgSpending$spending)
 sd(tgSpending$spending)
-hist(tgSpending$spending)
+hist(tgSpending$spending,col="blue")
 ```
 
 ```{r p414-spending}
@@ -492,7 +507,7 @@ plot(xrange, ysample15, type="l", col="red", main = "Distribution of average lif
 
 ### ***You then refer back to your notes and discover that you made a careless mistake, the sample size should have been n = 500. Will your p-value increase, decrease, or stay the same? Explain.***   
 
-#### The p-value will **decrease.**  Under the initial (incorrecly-formulated test) the standard error was calculated based upon the incorrect assumption that n = 50.  This calculation resulted in a p-value of 0.08.  For a given significance level such as alpha = 0.05, this p-value would have appeared to be too large to reject the null hypothesis in favor of the alternative.  However, this incorrect p-value would have stemmed from a **smaller-than expected Z-score**, which resulted from a **larger-than-expected Standard Error (SE)**.   
+#### The p-value will **decrease.**  Under the initial (incorrectly-formulated test) the standard error was calculated based upon the incorrect assumption that n = 50.  This calculation resulted in a p-value of 0.08.  For a given significance level such as alpha = 0.05, this p-value would have appeared to be too large to reject the null hypothesis in favor of the alternative.  However, this incorrect p-value would have stemmed from a **smaller-than expected Z-score**, which resulted from a **larger-than-expected Standard Error (SE)**.   
 
 #### As the Standard Error decreases with the reciprocal of the square root of the increase in the sample size, increasing the sample size by a factor of 10 would cause the SE to decrease by a factor of sqrt(10) = 3.162 .
 
