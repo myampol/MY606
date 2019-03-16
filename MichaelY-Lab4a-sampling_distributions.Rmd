@@ -1,7 +1,7 @@
 ---
 title: 'Lab 4a - Foundations for statistical inference - Sampling distributions'
 author: "Michael Y."
-date: "October 21st, 2018"
+date: "March 17th, 2019"
 output:
   html_document:
     css: ./lab.css
@@ -12,7 +12,7 @@ output:
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
-directory = "c:/users/Michael/DROPBOX/priv/CUNY/MSDS/201809-Fall/DATA606_Jason/Labs/Lab4a"
+directory = "c:/users/Michael/DROPBOX/priv/CUNY/MSDS/201902-Spring/DATA606-Jason/Labs/Lab4a"
 knitr::opts_knit$set(root.dir = directory)
 options(scipen = 999, digits = 2)
 ##setwd(directory)
@@ -94,7 +94,7 @@ home sales.
 
 #### Histogram of sample 1:    
 ```{r describe-samp1, eval=T}
-hist(samp1)
+hist(samp1,breaks=11,col = "blue")
 ```
 
 #### Sample 1 statistics:    
@@ -179,7 +179,7 @@ population.
 ### Sample 2, size = 50
 ```{r samp2, eval=TRUE}
 samp2 <- sample(area, 50)
-hist(samp2)
+hist(samp2,breaks=11,col="green")
 ```
 
 #### sample 2 statistics
@@ -395,7 +395,7 @@ for(i in 1:50000){
    sample_means50000[i] <- mean(samp)
    }
 
-hist(sample_means50000)
+hist(sample_means50000,col="yellow")
 summary(sample_means50000)
 sd(sample_means50000)
 ```
@@ -558,9 +558,9 @@ par(mfrow = c(3, 1))
 
 xlimits <- range(sample_means10)
 
-hist(sample_means10, breaks = 20, xlim = xlimits)
-hist(sample_means50, breaks = 20, xlim = xlimits)
-hist(sample_means100, breaks = 20, xlim = xlimits)
+hist(sample_means10, breaks = 20, xlim = xlimits, col="green")
+hist(sample_means50, breaks = 20, xlim = xlimits, col="yellow")
+hist(sample_means100, breaks = 20, xlim = xlimits, col="blue")
 ```
 
 The first command specifies that you'd like to divide the plotting area into 3 
@@ -683,7 +683,7 @@ for(i in 1:5000){
 
 ###   ***Plot the data*** :
 ```{r plot-sample-means-px-hist, eval=T}
-hist(sample_means50,breaks=25)
+hist(sample_means50,breaks=25,col="green")
 ```
 
 ### ***Describe the shape of this sampling distribution:    ***
@@ -776,8 +776,8 @@ par(mfrow = c(2, 1))
 
 xlimits <- range(sample_means50)
 
-hist(sample_means50, breaks = 20, xlim = xlimits)
-hist(sample_means150, breaks = 20, xlim = xlimits)
+hist(sample_means50, breaks = 20, xlim = xlimits, col="green")
+hist(sample_means150, breaks = 20, xlim = xlimits, col="yellow")
 invisible(par(new))
 ```
 
@@ -843,8 +843,3 @@ SamplingDistributionsSummaryPrice %>%
 ```
 
 
-<div id="license">
-This is a product of OpenIntro that is released under a [Creative Commons 
-Attribution-ShareAlike 3.0 Unported](http://creativecommons.org/licenses/by-sa/3.0).
-This lab was written for OpenIntro by Andrew Bray and Mine &Ccedil;etinkaya-Rundel.
-</div>
