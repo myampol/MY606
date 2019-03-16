@@ -1,7 +1,7 @@
 ---
 title: 'Lab 4b - Foundations for statistical inference - Confidence intervals'
 author: "Michael Y."
-date: "October 21st, 2018"
+date: "March 17th, 2019"
 output:
   html_document:
     css: ./lab.css
@@ -12,7 +12,7 @@ output:
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
-directory = "c:/users/Michael/DROPBOX/priv/CUNY/MSDS/201809-Fall/DATA606_Jason/Labs/Lab4b"
+directory = "c:/users/Michael/DROPBOX/priv/CUNY/MSDS/201902-Spring/DATA606-Jason/Labs/Lab4b"
 knitr::opts_knit$set(root.dir = directory)
 options(scipen = 999, digits = 8)
 ##setwd(directory)
@@ -357,8 +357,3 @@ failing_rows99
 ####This is as close as we can come to the confidence interval using 50 samples; we would need to increase the number of samples to a multiple of 100 in order to have an exact result of 99% success; 1% failure.
 
 
-<div id="license">
-This is a product of OpenIntro that is released under a [Creative Commons 
-Attribution-ShareAlike 3.0 Unported](http://creativecommons.org/licenses/by-sa/3.0).
-This lab was written for OpenIntro by Andrew Bray and Mine &Ccedil;etinkaya-Rundel.
-</div>
