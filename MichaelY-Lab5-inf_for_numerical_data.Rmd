@@ -1,13 +1,13 @@
 ---
 title: 'Lab5 - Inference for numerical data'
 author: "Michael Y."
-date: "October 28th, 2018"
+date: "March 24th, 2019"
 output:
-  pdf_document: default
   html_document:
     css: ./lab.css
     highlight: pygments
     theme: cerulean
+  pdf_document: default
 ---
 
 ```{r setup, include=FALSE}
@@ -80,7 +80,7 @@ questions.
 2.  Make a side-by-side boxplot of `habit` and `weight`. What does the plot 
 highlight about the relationship between these two variables?
 
-```{r}
+```{r boxplot, eval=T}
 boxplot(nc$weight~nc$habit,col=(c("lightblue","tan")))
 ```
 
@@ -327,7 +327,7 @@ $$ H_0 :\quad { \mu  }_{ low } \ne { \mu  }_{ notlow } \quad \Rightarrow \quad {
 
 
 #### Summary of the numeric variable:
-```{r}
+```{r numeric, eval=T}
 summary(nc$visits)
 sd(nc$visits, na.rm = T)
 ```
@@ -336,7 +336,7 @@ sd(nc$visits, na.rm = T)
 
 
 #### Summary of the categorical variable:
-```{r}
+```{rcategorical, eval=T}
 summary(nc$lowbirthweight)
 ```
 
@@ -363,19 +363,19 @@ cat("**Minimum** weight for **not low** babies: ", minnotlow, "\n")
 ####By visual inspection of the summary results, "**low**" is associated with those cases where the baby's birth weight is less than or equal to **`r maxlow`**, while "**not low**" is associated with those cases where the baby's birth weight is greater than or equal to **`r minnotlow`** .
 
 #### Histogram of number of hospital visits by mother during pregnancy:
-```{r}
+```{r histogram-visits, eval=T}
 hist(nc$visits, col="lightblue", breaks=31)
 ```
 
 
 #### Boxplot of number of prenatal hospital visits vs. low or normal birthweight
-```{r}
+```{r boxplot-visits, eval=T}
 boxplot(nc$visits ~ nc$lowbirthweight, main="Number of mother's prenatal hospital visits vs. baby weight", col=c('red','green'))
 ```
 
 #### Histograms one-above-the-other:
 
-```{r}
+```{r histograms, eval=T}
 nc %>% drop_na(visits) %>% spread(key = lowbirthweight, value=visits) %>%  select(low,`not low`) -> nc_visits
 
 par(mfrow = c(2,1))
@@ -418,10 +418,3 @@ inference(y = nc$visits, x = nc$lowbirthweight, est = "mean", type = "ci", null 
 
 #### In particular, for low-weight babies, average length of the pregnancy was only 33.4 weeks, while the average length was 38.9 weeks for babies of normal weight. Additionally, the low-weight baby set includes a majority of the number of "premies", i.e., prematurely-delivered infants.  Although these variables were not rigorously examined here, the smaller number of prenatal hospital visits by the mother in the case of low-weight babies might be explained by the fact that such babies tend to arrive prematurely, which means there is a shorter time period over which such hospital visits could occur.
 
-
-<div id="license">
-This is a product of OpenIntro that is released under a [Creative Commons 
-Attribution-ShareAlike 3.0 Unported](http://creativecommons.org/licenses/by-sa/3.0).
-This lab was adapted for OpenIntro by Mine &Ccedil;etinkaya-Rundel from a lab 
-written by the faculty and TAs of UCLA Statistics.
-</div>
