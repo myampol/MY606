@@ -1,7 +1,7 @@
 ---
 title: "MichaelY_HW5_Inference_Numerical"
 author: "Michael Y."
-date: "October 28, 2018"
+date: "March 24th, 2019"
 output:
   html_document:
     css: ./lab.css
@@ -12,17 +12,26 @@ output:
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+directory = "c:/Users/Michael/DROPBOX/priv/CUNY/MSDS/201902-Spring/DATA606-Jason/Homework"
+knitr::opts_knit$set(root.dir = directory)
+options(scipen = 999, digits = 8)
 library(DATA606)
 library(tidyr)
 library(dplyr)
 ```
 
 ```{r setwd,eval=T}
-setwd("c:/users/Michael/DROPBOX/priv/CUNY/MSDS/201809-Fall/DATA606_Jason/Homework")
+###setwd("c:/Users/Michael/DROPBOX/priv/CUNY/MSDS/201902-Spring/DATA606-Jason/Homework")
 ```
 # Homework - Chapter 5 - Inference for numerical data (pp.219-273)
 
 ### Exercises: 5.6, 5.14, 5.20, 5.32, 5.48 (pp.257-273)
+
+### Datasets:
+#### 5.20 - hsb2
+#### 5.32 - epa2012
+#### 5.48 - gss2010
+
 
 ## Exercise 5.6 Working backwards, Part II. 
 
@@ -187,7 +196,7 @@ hist(satdiff, col="lightblue")
 
 ### ***(b) Are the reading and writing scores of each student independent of each other?***    
 
-#### No, the scores of each student are not independent of each other, as a student who is good at writing is likely to be good at reading, and a student who is a poor reader is likely to be a poor writer.  Indeed, the analysis above calculates a sample correlation of 0.5967765 , with a 95% confidence interval for the population correlation to be (0.4993831 , 0.6792753).   If the scores were independed of each other, the correlation would be zero, as independence implies uncorrelatedness (but not vice-versa...)
+#### No, the scores of each student are not independent of each other, as a student who is good at writing is likely to be good at reading, and a student who is a poor reader is likely to be a poor writer.  Indeed, the analysis above calculates a sample correlation of 0.5967765 , with a 95% confidence interval for the population correlation to be **(0.4993831 , 0.6792753)**.   If the scores were independent of each other, the correlation would be zero, as independence implies uncorrelatedness (but not vice-versa...)
 
 ### ***(c) Create hypotheses appropriate for the following research question: is there an evident difference in the average scores of students in the reading and writing exam?***    
 
@@ -211,7 +220,8 @@ $$ H_0 :\quad { \mu  }_{ read } \ne { \mu  }_{ write } \quad \Rightarrow \quad {
 
 ### ***(e) The average observed difference in scores is***   
 $$ {\bar{x}_{read-write} = -0.545} $$
-### ***and the standard deviation of the differences is 8.887 points. Do these data provide convincing evidence of a difference between the average scores on the two exams?***    
+   
+### ***and the standard deviation of the differences is 8.887 points. Do these data provide convincing evidence of a difference between the average scores on the two exams?***   
 
 ```{r p520e, eval=T}
 

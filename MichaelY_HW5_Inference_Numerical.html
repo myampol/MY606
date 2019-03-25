@@ -11,7 +11,6 @@
 
 <meta name="author" content="Michael Y." />
 
-<meta name="date" content="2018-10-28" />
 
 <title>MichaelY_HW5_Inference_Numerical</title>
 
@@ -25,7 +24,7 @@
 
 
 <style type="text/css">code{white-space: pre;}</style>
-<style type="text/css">
+<style type="text/css" data-origin="pandoc">
 div.sourceCode { overflow-x: auto; }
 table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
   margin: 0; padding: 0; vertical-align: baseline; border: none; }
@@ -61,7 +60,29 @@ code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
 code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
 code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
 code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+
 </style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    for (var j = 0; j < rules.length; j++) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") continue;
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' || rule.style.backgroundColor === '') continue;
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
 <style type="text/css">
   pre:not([class]) {
     background-color: white;
@@ -125,6 +146,9 @@ img {
 button.code-folding-btn:focus {
   outline: none;
 }
+summary {
+  display: list-item;
+}
 </style>
 
 
@@ -132,14 +156,74 @@ button.code-folding-btn:focus {
 <div class="container-fluid main-container">
 
 <!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "";
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
 <script>
 $(document).ready(function () {
   window.buildTabsets("TOC");
 });
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open')
+  });
+});
 </script>
 
 <!-- code folding -->
-
 
 
 
@@ -151,16 +235,28 @@ $(document).ready(function () {
 
 <h1 class="title toc-ignore">MichaelY_HW5_Inference_Numerical</h1>
 <h4 class="author"><em>Michael Y.</em></h4>
-<h4 class="date"><em>October 28, 2018</em></h4>
+<h4 class="date"><em>March 24th, 2019</em></h4>
 
 </div>
 
 
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">setwd</span>(<span class="st">&quot;c:/users/Michael/DROPBOX/priv/CUNY/MSDS/201809-Fall/DATA606_Jason/Homework&quot;</span>)</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">###setwd(&quot;c:/Users/Michael/DROPBOX/priv/CUNY/MSDS/201902-Spring/DATA606-Jason/Homework&quot;)</code></pre></div>
 <div id="homework---chapter-5---inference-for-numerical-data-pp.219-273" class="section level1">
 <h1>Homework - Chapter 5 - Inference for numerical data (pp.219-273)</h1>
 <div id="exercises-5.6-5.14-5.20-5.32-5.48-pp.257-273" class="section level3">
 <h3>Exercises: 5.6, 5.14, 5.20, 5.32, 5.48 (pp.257-273)</h3>
+</div>
+<div id="datasets" class="section level3">
+<h3>Datasets:</h3>
+<div id="hsb2" class="section level4">
+<h4>5.20 - hsb2</h4>
+</div>
+<div id="epa2012" class="section level4">
+<h4>5.32 - epa2012</h4>
+</div>
+<div id="gss2010" class="section level4">
+<h4>5.48 - gss2010</h4>
+</div>
 </div>
 <div id="exercise-5.6-working-backwards-part-ii." class="section level2">
 <h2>Exercise 5.6 Working backwards, Part II.</h2>
@@ -197,21 +293,21 @@ p56_alpha &lt;-<span class="st"> </span><span class="dv">1</span> <span class="o
 <pre><code>## t_percentile:  0.95</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">p56_t_score &lt;-<span class="st"> </span><span class="kw">qt</span>(p56_t_percentile, p56_df)
 <span class="kw">cat</span>(<span class="st">&quot;t_score: &quot;</span>, p56_t_score, <span class="st">&quot;</span><span class="ch">\n</span><span class="st">&quot;</span>)</code></pre></div>
-<pre><code>## t_score:  1.710882</code></pre>
+<pre><code>## t_score:  1.7108821</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">p56_StandardError &lt;-<span class="st"> </span>p56_MarginOfError <span class="op">/</span><span class="st"> </span>p56_t_score
 <span class="kw">cat</span>(<span class="st">&quot;StandardError: &quot;</span>, p56_StandardError, <span class="st">&quot;</span><span class="ch">\n</span><span class="st">&quot;</span>)</code></pre></div>
-<pre><code>## StandardError:  3.506963</code></pre>
+<pre><code>## StandardError:  3.5069629</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">p56_SampleSTDev &lt;-<span class="st"> </span>p56_StandardError <span class="op">*</span><span class="st"> </span><span class="kw">sqrt</span>(p56_n)
 <span class="kw">cat</span>(<span class="st">&quot;Sample Standard Deviation: &quot;</span>, p56_SampleSTDev, <span class="st">&quot;</span><span class="ch">\n</span><span class="st">&quot;</span>)</code></pre></div>
-<pre><code>## Sample Standard Deviation:  17.53481</code></pre>
+<pre><code>## Sample Standard Deviation:  17.534815</code></pre>
 <div id="sample-mean-71-." class="section level4">
 <h4>Sample Mean: 71 .</h4>
 </div>
 <div id="margin-of-error-6-." class="section level4">
 <h4>Margin of Error: 6 .</h4>
 </div>
-<div id="sample-standard-deviation-17.5348146-." class="section level4">
-<h4>Sample Standard Deviation: 17.5348146 .</h4>
+<div id="sample-standard-deviation-17.53481456-." class="section level4">
+<h4>Sample Standard Deviation: 17.53481456 .</h4>
 </div>
 </div>
 <div id="section" class="section level3">
@@ -242,10 +338,10 @@ p514_alpha &lt;-<span class="st"> </span><span class="dv">1</span><span class="o
 <pre><code>## norm_percentile:  0.95</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">p514_z_score &lt;-<span class="st"> </span><span class="kw">qnorm</span>(p514_percentile)
 <span class="kw">cat</span>(<span class="st">&quot;Z-score: &quot;</span>, p514_z_score, <span class="st">&quot;</span><span class="ch">\n</span><span class="st">&quot;</span>)</code></pre></div>
-<pre><code>## Z-score:  1.644854</code></pre>
+<pre><code>## Z-score:  1.6448536</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">p514_StandardError &lt;-<span class="st"> </span>p514_MarginOfError <span class="op">/</span><span class="st"> </span>p514_z_score
 <span class="kw">cat</span>(<span class="st">&quot;Standard Error: &quot;</span>, p514_StandardError, <span class="st">&quot;</span><span class="ch">\n</span><span class="st">&quot;</span>)</code></pre></div>
-<pre><code>## Standard Error:  15.19892</code></pre>
+<pre><code>## Standard Error:  15.198921</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">p514_SampleSize &lt;-<span class="st"> </span>(p514_StandardDeviation <span class="op">/</span><span class="st"> </span>p514_StandardError)<span class="op">^</span><span class="dv">2</span>
 ### round up
 p514_SampleSize &lt;-<span class="st"> </span><span class="kw">ceiling</span>(p514_SampleSize)
@@ -286,10 +382,10 @@ p514c_alpha &lt;-<span class="st"> </span><span class="dv">1</span><span class="
 <pre><code>## norm_percentile:  0.995</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">p514c_z_score &lt;-<span class="st"> </span><span class="kw">qnorm</span>(p514c_percentile)
 <span class="kw">cat</span>(<span class="st">&quot;Z-score: &quot;</span>, p514c_z_score, <span class="st">&quot;</span><span class="ch">\n</span><span class="st">&quot;</span>)</code></pre></div>
-<pre><code>## Z-score:  2.575829</code></pre>
+<pre><code>## Z-score:  2.5758293</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">p514c_StandardError &lt;-<span class="st"> </span>p514_MarginOfError <span class="op">/</span><span class="st"> </span>p514c_z_score
 <span class="kw">cat</span>(<span class="st">&quot;Standard Error: &quot;</span>, p514c_StandardError, <span class="st">&quot;</span><span class="ch">\n</span><span class="st">&quot;</span>)</code></pre></div>
-<pre><code>## Standard Error:  9.705612</code></pre>
+<pre><code>## Standard Error:  9.7056121</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">p514c_SampleSize &lt;-<span class="st"> </span>(p514_StandardDeviation <span class="op">/</span><span class="st"> </span>p514c_StandardError)<span class="op">^</span><span class="dv">2</span>
 ### round up
 p514c_SampleSize &lt;-<span class="st"> </span><span class="kw">ceiling</span>(p514c_SampleSize)
@@ -324,7 +420,7 @@ satdiff &lt;-<span class="st"> </span>satread <span class="op">-</span><span cla
 ##   28.00   44.00   50.00   52.23   60.00   76.00</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">summary</span>(satwrite)</code></pre></div>
 <pre><code>##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
-##   31.00   45.75   54.00   52.77   60.00   67.00</code></pre>
+##  31.000  45.750  54.000  52.775  60.000  67.000</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">summary</span>(satdiff)</code></pre></div>
 <pre><code>##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
 ## -21.000  -7.000   0.000  -0.545   6.000  24.000</code></pre>
@@ -333,13 +429,13 @@ satdiff &lt;-<span class="st"> </span>satread <span class="op">-</span><span cla
 ##  Pearson's product-moment correlation
 ## 
 ## data:  satread and satwrite
-## t = 10.465, df = 198, p-value &lt; 2.2e-16
+## t = 10.4652, df = 198, p-value &lt; 0.000000000000000222
 ## alternative hypothesis: true correlation is not equal to 0
 ## 95 percent confidence interval:
-##  0.4993831 0.6792753
+##  0.49938307 0.67927528
 ## sample estimates:
-##       cor 
-## 0.5967765</code></pre>
+##        cor 
+## 0.59677648</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">boxplot</span>(satread, satwrite)</code></pre></div>
 <p><img src="data:image/png;base64,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" width="672" /></p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">hist</span>(satdiff, <span class="dt">col=</span><span class="st">&quot;lightblue&quot;</span>)</code></pre></div>
@@ -359,8 +455,8 @@ satdiff &lt;-<span class="st"> </span>satread <span class="op">-</span><span cla
 </div>
 <div id="b-are-the-reading-and-writing-scores-of-each-student-independent-of-each-other" class="section level3">
 <h3><strong><em>(b) Are the reading and writing scores of each student independent of each other?</em></strong></h3>
-<div id="no-the-scores-of-each-student-are-not-independent-of-each-other-as-a-student-who-is-good-at-writing-is-likely-to-be-good-at-reading-and-a-student-who-is-a-poor-reader-is-likely-to-be-a-poor-writer.-indeed-the-analysis-above-calculates-a-sample-correlation-of-0.5967765-with-a-95-confidence-interval-for-the-population-correlation-to-be-0.4993831-0.6792753.-if-the-scores-were-independed-of-each-other-the-correlation-would-be-zero-as-independence-implies-uncorrelatedness-but-not-vice-versa" class="section level4">
-<h4>No, the scores of each student are not independent of each other, as a student who is good at writing is likely to be good at reading, and a student who is a poor reader is likely to be a poor writer. Indeed, the analysis above calculates a sample correlation of 0.5967765 , with a 95% confidence interval for the population correlation to be (0.4993831 , 0.6792753). If the scores were independed of each other, the correlation would be zero, as independence implies uncorrelatedness (but not vice-versa…)</h4>
+<div id="no-the-scores-of-each-student-are-not-independent-of-each-other-as-a-student-who-is-good-at-writing-is-likely-to-be-good-at-reading-and-a-student-who-is-a-poor-reader-is-likely-to-be-a-poor-writer.-indeed-the-analysis-above-calculates-a-sample-correlation-of-0.5967765-with-a-95-confidence-interval-for-the-population-correlation-to-be-0.4993831-0.6792753.-if-the-scores-were-independent-of-each-other-the-correlation-would-be-zero-as-independence-implies-uncorrelatedness-but-not-vice-versa" class="section level4">
+<h4>No, the scores of each student are not independent of each other, as a student who is good at writing is likely to be good at reading, and a student who is a poor reader is likely to be a poor writer. Indeed, the analysis above calculates a sample correlation of 0.5967765 , with a 95% confidence interval for the population correlation to be <strong>(0.4993831 , 0.6792753)</strong>. If the scores were independent of each other, the correlation would be zero, as independence implies uncorrelatedness (but not vice-versa…)</h4>
 </div>
 </div>
 <div id="c-create-hypotheses-appropriate-for-the-following-research-question-is-there-an-evident-difference-in-the-average-scores-of-students-in-the-reading-and-writing-exam" class="section level3">
@@ -391,7 +487,10 @@ satdiff &lt;-<span class="st"> </span>satread <span class="op">-</span><span cla
 </div>
 <div id="e-the-average-observed-difference-in-scores-is" class="section level3">
 <h3><strong><em>(e) The average observed difference in scores is</em></strong></h3>
-<p><span class="math display">\[ {\bar{x}_{read-write} = -0.545} \]</span> ### <strong><em>and the standard deviation of the differences is 8.887 points. Do these data provide convincing evidence of a difference between the average scores on the two exams?</em></strong></p>
+<p><span class="math display">\[ {\bar{x}_{read-write} = -0.545} \]</span></p>
+</div>
+<div id="and-the-standard-deviation-of-the-differences-is-8.887-points.-do-these-data-provide-convincing-evidence-of-a-difference-between-the-average-scores-on-the-two-exams" class="section level3">
+<h3><strong><em>and the standard deviation of the differences is 8.887 points. Do these data provide convincing evidence of a difference between the average scores on the two exams?</em></strong></h3>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">p520_StandardDeviation &lt;-<span class="st"> </span><span class="fl">8.887</span>
 p520_DiffMean &lt;-<span class="st"> </span><span class="op">-</span><span class="fl">0.545</span>
 p520_SampleSize &lt;-<span class="st"> </span><span class="dv">200</span>
@@ -401,12 +500,12 @@ p520_StandardError &lt;-<span class="st"> </span>p520_StandardDeviation <span cl
 <pre><code>## Standard Error:  0.6284058</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">p520_Zscore &lt;-<span class="st"> </span>p520_DiffMean <span class="op">/</span><span class="st"> </span>p520_StandardError
 <span class="kw">cat</span>(<span class="st">&quot;Zscore: &quot;</span>, p520_Zscore, <span class="st">&quot;</span><span class="ch">\n</span><span class="st">&quot;</span>)</code></pre></div>
-<pre><code>## Zscore:  -0.867274</code></pre>
+<pre><code>## Zscore:  -0.86727399</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">p520_pval &lt;-<span class="st"> </span><span class="dv">2</span><span class="op">*</span><span class="kw">pnorm</span>(p520_Zscore)
 <span class="kw">cat</span>(<span class="st">&quot;pval: &quot;</span>, p520_pval)</code></pre></div>
-<pre><code>## pval:  0.3857919</code></pre>
-<div id="because-the-pval0.3857919-is-so-large-these-data-do-not-provide-convincing-evidence-of-a-difference-between-the-average-scores-on-the-two-exams.-therefore-we-cannot-reject-the-null-hypothesis." class="section level4">
-<h4>Because the pval=0.3857919 is so large, these data do <strong>not</strong> provide convincing evidence of a difference between the average scores on the two exams. Therefore we cannot reject the null hypothesis.</h4>
+<pre><code>## pval:  0.38579191</code></pre>
+<div id="because-the-pval0.38579191-is-so-large-these-data-do-not-provide-convincing-evidence-of-a-difference-between-the-average-scores-on-the-two-exams.-therefore-we-cannot-reject-the-null-hypothesis." class="section level4">
+<h4>Because the pval=0.38579191 is so large, these data do <strong>not</strong> provide convincing evidence of a difference between the average scores on the two exams. Therefore we cannot reject the null hypothesis.</h4>
 </div>
 </div>
 <div id="f-what-type-of-error-might-we-have-made-explain-what-the-error-means-in-the-context-of-the-application." class="section level3">
@@ -426,16 +525,16 @@ p520_alpha &lt;-<span class="st"> </span><span class="dv">1</span><span class="o
 <pre><code>## norm_percentile:  0.95</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">p520_p95_Zscore &lt;-<span class="st"> </span><span class="kw">qnorm</span>(p520_percentile)
 <span class="kw">cat</span>(<span class="st">&quot;p95 Zscore :&quot;</span>, p520_p95_Zscore, <span class="st">&quot;</span><span class="ch">\n</span><span class="st">&quot;</span>)</code></pre></div>
-<pre><code>## p95 Zscore : 1.644854</code></pre>
+<pre><code>## p95 Zscore : 1.6448536</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">p520_p95_MarginOfError &lt;-<span class="st"> </span>p520_p95_Zscore <span class="op">*</span><span class="st"> </span>p520_StandardError
 <span class="kw">cat</span>(<span class="st">&quot;p95 Margin of Error: &quot;</span>,p520_p95_MarginOfError,  <span class="st">&quot;</span><span class="ch">\n</span><span class="st">&quot;</span>)</code></pre></div>
-<pre><code>## p95 Margin of Error:  1.033636</code></pre>
+<pre><code>## p95 Margin of Error:  1.0336356</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">p520_lo &lt;-<span class="st"> </span>p520_DiffMean <span class="op">-</span><span class="st"> </span>p520_p95_MarginOfError
 p520_hi &lt;-<span class="st"> </span>p520_DiffMean <span class="op">+</span><span class="st"> </span>p520_p95_MarginOfError
 <span class="kw">cat</span>(<span class="st">&quot;90% Confidence Interval: (&quot;</span>, p520_lo, <span class="st">&quot;,&quot;</span>,p520_hi, <span class="st">&quot;)</span><span class="ch">\n</span><span class="st">&quot;</span> )</code></pre></div>
-<pre><code>## 90% Confidence Interval: ( -1.578636 , 0.4886356 )</code></pre>
-<div id="yes-a-confidence-interval-should-include-zero.-although-no-confidence-interval-has-been-specified-our-sample-mean-is-less-than-1-standard-deviation-from-zero.-in-the-case-of-say-a-90-confidence-interval-the-bounds-would-be--1.5786356-0.4886356-which-includes-zero.-indeed-we-would-have-to-weaken-the-confidence-interval-to-61-in-order-to-fail-to-include-zero." class="section level4">
-<h4>Yes, a confidence interval should include zero. Although no confidence interval has been specified, our sample mean is less than 1 standard deviation from zero. In the case of, say, a 90% confidence interval, the bounds would be ( -1.5786356 , 0.4886356 ) , which includes zero. Indeed, we would have to weaken the confidence interval to 61% in order to fail to include zero.</h4>
+<pre><code>## 90% Confidence Interval: ( -1.5786356 , 0.48863555 )</code></pre>
+<div id="yes-a-confidence-interval-should-include-zero.-although-no-confidence-interval-has-been-specified-our-sample-mean-is-less-than-1-standard-deviation-from-zero.-in-the-case-of-say-a-90-confidence-interval-the-bounds-would-be--1.57863555-0.48863555-which-includes-zero.-indeed-we-would-have-to-weaken-the-confidence-interval-to-61-in-order-to-fail-to-include-zero." class="section level4">
+<h4>Yes, a confidence interval should include zero. Although no confidence interval has been specified, our sample mean is less than 1 standard deviation from zero. In the case of, say, a 90% confidence interval, the bounds would be ( -1.57863555 , 0.48863555 ) , which includes zero. Indeed, we would have to weaken the confidence interval to 61% in order to fail to include zero.</h4>
 </div>
 </div>
 <div id="section-2" class="section level3">
@@ -490,19 +589,19 @@ p532_diff_mean_MPG   &lt;-<span class="st"> </span>p532_mean_automatic <span cla
 <pre><code>## Difference in average MPG between Automatic vs. Manual:  -3.73</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">p532_StandardError   &lt;-<span class="st"> </span><span class="kw">sqrt</span>((p532_sd_automatic<span class="op">^</span><span class="dv">2</span>)<span class="op">/</span>p532_n_automatic <span class="op">+</span><span class="st"> </span>(p532_sd_manual<span class="op">^</span><span class="dv">2</span>)<span class="op">/</span>p532_n_manual)
 <span class="kw">cat</span>(<span class="st">&quot;StandardError:&quot;</span>, p532_StandardError, <span class="st">&quot;</span><span class="ch">\n</span><span class="st">&quot;</span>)</code></pre></div>
-<pre><code>## StandardError: 1.12927</code></pre>
+<pre><code>## StandardError: 1.1292697</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">p532_t_score         &lt;-<span class="st"> </span>(p532_diff_mean_MPG <span class="op">-</span><span class="st"> </span><span class="dv">0</span>) <span class="op">/</span><span class="st"> </span>p532_StandardError
 <span class="kw">cat</span>(<span class="st">&quot;T-score: &quot;</span>, p532_t_score, <span class="st">&quot;</span><span class="ch">\n</span><span class="st">&quot;</span>)</code></pre></div>
-<pre><code>## T-score:  -3.30302</code></pre>
+<pre><code>## T-score:  -3.3030197</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">p532_df &lt;-<span class="st"> </span><span class="kw">min</span>(p532_n_automatic<span class="op">-</span><span class="dv">1</span>, p532_n_manual<span class="op">-</span><span class="dv">1</span>)
 <span class="kw">cat</span>(<span class="st">&quot;Degrees of Freedom: &quot;</span>, p532_df, <span class="st">&quot;</span><span class="ch">\n</span><span class="st">&quot;</span>)</code></pre></div>
 <pre><code>## Degrees of Freedom:  25</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">p532_pval &lt;-<span class="st"> </span><span class="kw">pt</span>(<span class="dt">q=</span>p532_t_score,<span class="dt">df =</span> p532_df ) <span class="op">*</span><span class="st"> </span><span class="dv">2</span>
 <span class="kw">cat</span>(<span class="st">&quot;pval: &quot;</span>, p532_pval, <span class="st">&quot;</span><span class="ch">\n</span><span class="st">&quot;</span>)</code></pre></div>
-<pre><code>## pval:  0.002883615</code></pre>
+<pre><code>## pval:  0.0028836148</code></pre>
 </div>
-<div id="yes-these-data-provide-strong-evidence-of-a-difference-in-fuel-economy-between-automatic-and-manual-transmission-vehicles-based-upon-the-city-mpg-sample-given-as-the-p-value-is-0.0028836-." class="section level4">
-<h4>Yes, these data provide strong evidence of a difference in fuel economy between automatic and manual transmission vehicles, based upon the City MPG sample given, as the p-value is 0.0028836 .</h4>
+<div id="yes-these-data-provide-strong-evidence-of-a-difference-in-fuel-economy-between-automatic-and-manual-transmission-vehicles-based-upon-the-city-mpg-sample-given-as-the-p-value-is-0.00288361-." class="section level4">
+<h4>Yes, these data provide strong evidence of a difference in fuel economy between automatic and manual transmission vehicles, based upon the City MPG sample given, as the p-value is 0.00288361 .</h4>
 </div>
 </div>
 <div id="section-3" class="section level3">
@@ -543,14 +642,14 @@ counts &lt;-<span class="st"> </span><span class="kw">unlist</span>(<span class=
 ### reproduce the chart that appears in the textbook on page 272
 Educ.Attainment &lt;-<span class="st"> </span><span class="kw">rbind</span>(means,stdevs,counts)
 Educ.Attainment</code></pre></div>
-<pre><code>##        LT HIGH SCHOOL HIGH SCHOOL JUNIOR COLLEGE  BACHELOR  GRADUATE
-## means        38.66942    39.59707       41.39175  42.54941  40.84516
-## stdevs       15.81423    14.97125       18.10361  13.61731  15.50540
-## counts      121.00000   546.00000       97.00000 253.00000 155.00000
-##             TOTAL
-## means    40.45222
-## stdevs   15.16739
-## counts 1172.00000</code></pre>
+<pre><code>##        LT HIGH SCHOOL HIGH SCHOOL JUNIOR COLLEGE   BACHELOR   GRADUATE
+## means       38.669421   39.597070      41.391753  42.549407  40.845161
+## stdevs      15.814228   14.971248      18.103612  13.617308  15.505400
+## counts     121.000000  546.000000      97.000000 253.000000 155.000000
+##              TOTAL
+## means    40.452218
+## stdevs   15.167393
+## counts 1172.000000</code></pre>
 </div>
 <div id="a-write-hypotheses-for-evaluating-whether-the-average-number-of-hours-worked-varies-across-the-five-groups." class="section level3">
 <h3><strong><em>(a) Write hypotheses for evaluating whether the average number of hours worked varies across the five groups.</em></strong></h3>
@@ -642,15 +741,15 @@ p548_SSG &lt;-<span class="st"> </span>p548_MSG <span class="op">*</span><span c
 <pre><code>## degree-SumSq (SSG):  2006.16</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">p548_SST &lt;-<span class="st"> </span>p548_SSG <span class="op">+</span><span class="st"> </span>p548_SSE
 <span class="kw">cat</span>(<span class="st">&quot;Total-SumSq (SST): &quot;</span>, p548_SST, <span class="st">&quot;</span><span class="ch">\n</span><span class="st">&quot;</span>)</code></pre></div>
-<pre><code>## Total-SumSq (SST):  269388.2</code></pre>
+<pre><code>## Total-SumSq (SST):  269388.16</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">### Compute the Mean Squares column
 p548_MSE &lt;-<span class="st"> </span>p548_SSE <span class="op">/</span><span class="st"> </span>p548_dfe
 <span class="kw">cat</span>(<span class="st">&quot;Residuals-MeanSq (MSE) :&quot;</span>, p548_MSE, <span class="st">&quot;</span><span class="ch">\n</span><span class="st">&quot;</span>)</code></pre></div>
-<pre><code>## Residuals-MeanSq (MSE) : 229.1191</code></pre>
+<pre><code>## Residuals-MeanSq (MSE) : 229.11911</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">### Compute the F statistic
 p548_F &lt;-<span class="st"> </span>p548_MSG <span class="op">/</span><span class="st"> </span>p548_MSE
 <span class="kw">cat</span>(<span class="st">&quot;F-statistic: &quot;</span>, p548_F, <span class="st">&quot;</span><span class="ch">\n</span><span class="st">&quot;</span>)</code></pre></div>
-<pre><code>## F-statistic:  2.188992</code></pre>
+<pre><code>## F-statistic:  2.1889925</code></pre>
 </div>
 <div id="put-the-computed-values-in-the-grid" class="section level4">
 <h4>Put the computed values in the grid:</h4>
@@ -663,10 +762,10 @@ p548_grid[<span class="st">&quot;Residuals&quot;</span>,<span class="st">&quot;M
 p548_grid[<span class="st">&quot;degree&quot;</span>,<span class="st">&quot;Fvalue&quot;</span>]    &lt;-<span class="st"> </span>p548_F
 
 p548_grid</code></pre></div>
-<pre><code>##             Df     SumSq   MeanSq   Fvalue Pr(&gt;F)
-## degree       4   2006.16 501.5400 2.188992 0.0682
-## Residuals 1167 267382.00 229.1191       NA     NA
-## Total     1171 269388.16       NA       NA     NA</code></pre>
+<pre><code>##             Df     SumSq    MeanSq    Fvalue Pr(&gt;F)
+## degree       4   2006.16 501.54000 2.1889925 0.0682
+## Residuals 1167 267382.00 229.11911        NA     NA
+## Total     1171 269388.16        NA        NA     NA</code></pre>
 </div>
 <div id="check-the-f-statistic-vs.the-given-pval" class="section level4">
 <h4>Check the F statistic vs. the given pval:</h4>
@@ -674,7 +773,7 @@ p548_grid</code></pre></div>
 <pre><code>## Given pval:       0.0682</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">p548_calculated_pval &lt;-<span class="st"> </span><span class="kw">pf</span>(p548_F,p548_dfg,p548_dfe,<span class="dt">lower.tail =</span> F)
 <span class="kw">cat</span>(<span class="st">&quot;Calculated pval: &quot;</span>, p548_calculated_pval, <span class="st">&quot;</span><span class="ch">\n</span><span class="st">&quot;</span>)</code></pre></div>
-<pre><code>## Calculated pval:  0.06819325</code></pre>
+<pre><code>## Calculated pval:  0.068193249</code></pre>
 </div>
 <div id="check-results-vs.actual-anova-calculations-on-the-full-gss-data-set" class="section level4">
 <h4>Check results vs. actual ANOVA calculations on the full GSS data set:</h4>
@@ -682,10 +781,10 @@ p548_grid</code></pre></div>
 p548_anovatable &lt;-<span class="st"> </span><span class="kw">anova</span>(p548_linearmodel)
 p548_actual_ANOVA &lt;-<span class="st"> </span><span class="kw">rbind</span>(<span class="kw">data.frame</span>(p548_anovatable),<span class="dt">Total=</span><span class="kw">c</span>(<span class="kw">sum</span>(p548_anovatable<span class="op">$</span>Df), <span class="kw">sum</span>(p548_anovatable<span class="op">$</span><span class="st">`</span><span class="dt">Sum Sq</span><span class="st">`</span>),<span class="ot">NA</span>,<span class="ot">NA</span>,<span class="ot">NA</span>))
 p548_actual_ANOVA</code></pre></div>
-<pre><code>##                  Df     Sum.Sq  Mean.Sq  F.value     Pr..F.
-## gss2010$degree    4   2006.162 501.5406 2.188994 0.06819311
-## Residuals      1167 267382.162 229.1192       NA         NA
-## Total          1171 269388.324       NA       NA         NA</code></pre>
+<pre><code>##                  Df      Sum.Sq   Mean.Sq   F.value      Pr..F.
+## gss2010$degree    4   2006.1624 501.54059 2.1889937 0.068193109
+## Residuals      1167 267382.1619 229.11925        NA          NA
+## Total          1171 269388.3242        NA        NA          NA</code></pre>
 </div>
 </div>
 <div id="d-what-is-the-conclusion-of-the-test" class="section level3">
