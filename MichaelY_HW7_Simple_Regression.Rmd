@@ -1,0 +1,469 @@
+---
+title: "MichaelY - HW7 - Introduction to linear regression"
+author: "Michael Y."
+date: "April 14th, 2019"
+output:
+  html_document:
+    css: ./lab.css
+    highlight: pygments
+    theme: cerulean
+  pdf_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+directory = "c:/Users/Michael/DROPBOX/priv/CUNY/MSDS/201902-Spring/DATA606-Jason/Homework"
+knitr::opts_knit$set(root.dir = directory)
+options(scipen = 999, digits = 8, width=140)
+##setwd(directory)
+library(DATA606)
+library(tidyr)
+library(dplyr)
+library(kableExtra)
+library(ggplot2)
+library(psych)
+```
+
+
+```{r setwd,eval=T}
+###setwd("c:/Users/Michael/DROPBOX/priv/CUNY/MSDS/201902-Spring/DATA606-Jason/Homework")
+```
+# Homework - Chapter 7 - Introduction to Linear Regression (pp.331-355)
+
+### Practice : 7.23, 7.25, 7.29, 7.39 (pp.356-371)
+### Datasets:
+####7.23 - tourism
+####7.25 - coast_starlight
+####7.29 - murders
+####7.39 - urban_owner
+
+
+### ***Exercises: 7.24, 7.26, 7.30, 7.40 (pp.356-371)***
+### Datasets:
+
+####7.24 - starbucks
+####7.26 - bdims
+####7.30 - cats
+####7.40 - prof_evals  --NB: the actual name of this data set is "prof.evaltns.beauty.public"
+
+### #.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.
+
+## Exercise 7.24 Nutrition at Starbucks, Part I. 
+
+### ***The scatterplot below shows the relationship between the number of calories and amount of carbohydrates (in grams) Starbucks food menu items contain.***
+
+### ***Since Starbucks only lists the number of calories on the display items, we are interested in predicting the amount of carbs a menu item has based on its calorie content.***
+
+```{r p724, eval=T}
+# look at the exact data set referenced
+data("starbucks")
+summary(starbucks)
+```
+
+
+
+```{r p724x, eval=T}
+sbux_model <- lm(carb ~ calories, data=starbucks)
+summary(sbux_model)
+anova(sbux_model)
+plot(carb ~ calories, data=starbucks)
+abline(sbux_model, col="blue")
+title(main="Starbucks menu items: calories vs. carbs")
+```
+
+```{r p724y, eval=T}
+sbux_model <- lm(carb ~ calories, data=starbucks)
+plot(sbux_model$residuals ~ starbucks$calories)
+abline(h = 0, lty = 3, col="red", lwd=2)  # adds a horizontal dashed line at y = 0
+title(main="Starbucks residuals: actual vs. predicted carbs")
+```
+
+
+```{r p724z, eval=T}
+hist(sbux_model$residuals, col="lightblue")
+
+```
+
+### ***(a) Describe the relationship between number of calories and amount of carbohydrates (in grams) that Starbucks food menu items contain.***
+
+##### There is an increasing relationship between the number of calories and the amount of carbohydrates that Starbucks menu items contain.
+
+### ***(b) In this scenario, what are the explanatory and response variables?***
+
+##### The explanatory variable is the amount of calories, while the response variable is the amount of carbs.
+
+```{r p724b, eval=T}
+
+```
+
+### ***(c) Why might we want to fit a regression line to these data?***
+
+##### We may want to evaluate the slope of such line (it's 0.106031) to understand the general relationship between calories and carbs.  Also, we may want to evaluate the goodness-of-fit between the actual values and the predicted values by examining the residuals.
+
+```{r p724c, eval=T}
+
+```
+
+### ***(d) Do these data meet the conditions required for fitting a least squares line?***
+
+##### The data appear to indicate a linear trend; the residuals do not show a pattern. 
+##### They appear to be nearly normal.
+##### Regarding heteroscedasticity, the carbs corresponding to low calorie counts show smaller residuals than carbs corresponding to high calorie counts.  This suggests non-constant variance, which is noted in the low p-value in the Breusch-Pagan test below.  One way to sidestep this problem may be to model the logarithm of the data series rather than the series itself.   This is the sole test which does not "pass."
+
+```{r p724d, eval=T}
+
+require(lmSupport)    ## Note:  the "S" is capitalized in the package name
+modelAssumptions(sbux_model,"LINEAR")
+
+shapiro.test(sbux_model$residuals)
+ks.test(sbux_model$residuals,"pnorm",0,sd(sbux_model$residuals))
+
+require(nortest)
+ad.test(sbux_model$residuals)
+
+require(tseries)
+jarque.bera.test(sbux_model$residuals)
+
+require(olsrr)
+ols_test_breusch_pagan(sbux_model)
+
+```
+
+
+
+### #.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.
+
+## Exercise 7.26 Body measurements, Part III. 
+
+Exercise 7.15 introduces data on shoulder girth and height of a group of individuals. 
+
+The mean shoulder girth is 107.20 cm with a standard deviation of 10.37 cm. 
+
+The mean height is 171.14 cm with a standard deviation of 9.41 cm. 
+
+The correlation between height and shoulder girth is 0.67.
+
+```{r p726, eval=T}
+# look at the exact data set referenced
+data("bdims")
+#summary(bdims)
+p726_shogi_mean <- mean(bdims$sho.gi)
+p726_shogi_mean
+
+p726_shogi_sd <- sd(bdims$sho.gi)
+p726_shogi_sd
+
+p726_hgt_mean <- mean(bdims$hgt)
+p726_hgt_mean
+
+p726_hgt_sd   <- sd(bdims$hgt)
+p726_hgt_sd
+
+p726_correl   <- cor(bdims$sho.gi, bdims$hgt)
+
+p726_slope    <- p726_hgt_sd / p726_shogi_sd * p726_correl
+p726_slope
+
+b1 <- p726_slope
+
+p726_intercept <- p726_hgt_mean - b1 * p726_shogi_mean
+p726_intercept
+```
+
+
+$${y - \bar{y} = b_1{(x - \bar{x})}}$$
+$${y - HeightMean = b_1{(x - shoulderGirthMean)}}$$
+$${y - HeightMean = b_1{(x - shoulderGirthMean)}} = b_1*x-b_1*shoulderGirthMean$$
+$${y  =  b_1x + (HeightMean-b_1shoulderGirthMean)}$$
+
+```{r 726x, eval=T}
+
+###
+
+mod <- lm(bdims$hgt ~ bdims$sho.gi)
+summary(mod)
+```
+
+### ***(a) Write the equation of the regression line for predicting height.***
+
+##### Given the actual data in the dataset, the equation would be: 
+
+$$ height = 105.832462 + .603644 * ShoulderGirth $$
+
+##### Given the summary data in the textbook (which contains a typo !!!! ), we obtain: 
+
+```{r 726a, eval=T}
+
+
+b1 = 9.41 / 10.37 * 0.67
+b1
+
+b0 = 171.14 -b1 * 107.20
+b0
+
+```
+
+$$ Height = 105.965 + .60797 * ShoulderGirth $$
+
+
+### It is worth noting that the textbook incorrectly indicates that the mean shoulder girth is 107.20 when the dataset indicates that it is actually 108.20 .  This typo will yield differing results.
+
+### ***(b) Interpret the slope and the intercept in this context.***
+
+
+##### The slope of about 0.60 indicates that each 1 centimeter increase in shoulder girth is associated with an increase in height of 0.60 cm.
+
+##### The intercept of about 105.8 or 105.9 (depending on whether one is using the actual dataset, or relying on the typo in the textbook) indicates that ShoulderGirth of zero predicts  a height of about 105.8 cm.  (Of course, it is not possible to have a ShoulderGirth of zero.  The smallest ShoulderGirth in the data set is 85.90cm.)
+
+```{r 726b, eval=T}
+
+```
+
+
+
+### ***(c) Calculate R2 of the regression line for predicting height from shoulder girth, and interpret it in the context of the application.***
+
+##### Given that the correlation is .67, the $R^2$ would be $.67^2 = .44$ 
+
+##### From the data:
+```{r 726c, eval=T}
+summary(mod)$r.squared
+
+```
+##### This means that the Shoulder Girth explains 44 percent of the variability of the height.
+
+
+
+### ***(d) A randomly selected student from your class has a shoulder girth of 100 cm. Predict the height of this student using the model.***
+
+```{r 726d, eval=T}
+predict_exact <- 105.832462 + .603644*100
+predict_exact
+
+predict_texterror <- 105.965 + .60797*100
+predict_texterror
+```
+
+##### The model indicates that the student has predicted height of 166.2 cm (using the exact data from the dataset) or the student has predicted height of 166.76cm (using the incorrect summary data in the textbook.)
+
+### ***(e) The student from part (d) is 160 cm tall. Calculate the residual, and explain what this residual means.***
+
+##### The residual is the difference between the student's actual height (160 cm) and the predicted height as fitted by the model (either 166.2 or 166.76 , depending on which source you use.)  This means that the residual is negative 6.2 cm (or, negative 6.76 cm) as the model has over-predicted this student's height.
+
+```{r 726e, eval=T}
+
+```
+
+
+### ***(f) A one year old has a shoulder girth of 56 cm. Would it be appropriate to use this linear model to predict the height of this child?***
+
+
+##### No, it would not be appropriate to use this model because, as indicated above, the smallest shoulder girth in this dataset is 85.9 cm.  Doing so would require extrapolation well outside of the range of known data, which is ill-advised.
+```{r 726f, eval=T}
+
+plot(bdims$hgt ~ bdims$sho.gi)
+abline(mod, col="red")
+title(main="Body Dimensions: shoulder girth (cm) vs. height (cm)")
+
+```
+
+
+### #.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.
+
+## Exercise 7.30 Cats, Part I. 
+
+The following regression output is for predicting the heart weight (in g) of cats from their body weight (in kg). 
+The coefficients are estimated using a dataset of 144 domestic cats.
+
+
+
+
+
+```{r p730, eval=T}
+# look at the exact data set referenced
+data("cats")
+summary(cats)
+catmodel <- lm(cats$Hwt ~cats$Bwt)
+summary(catmodel)
+anova(catmodel)
+```
+
+```{r p730-plot, eval=T}
+# plot the data
+plot(cats$Hwt ~cats$Bwt, col="blue")
+abline(catmodel, col="red")
+title(main = "Cat body weight (kg) vs. heart weight (g)")
+```
+
+
+### ***(a) Write out the linear model.***
+
+$$ HeartWeight(g) = 4.034 * BodyWeight(kg) - 0.357$$
+```{r 730a, eval=T}
+
+```
+
+
+### ***(b) Interpret the intercept.***
+
+##### The intercept means that if we had a cat with zero body weight, then we would predict such cat to have heart weight of negative 0.357 grams.  This is, of course, absurd, because we would never extrapolate so far as to consider a weightless cat.
+
+```{r 730b, eval=T}
+
+```
+
+
+### ***(c) Interpret the slope.***
+
+##### The slope of 4.034 indicates that if we were to consider two cats whose body weights differ by 1kg, then we would expect that the weights of their hearts would differ by 4.034 grams (with, obviously, the heavier cat possessing the heavier heart.)
+
+##### Some may believe that this equation indicates that if an individual cat's body weight were to increase by 1kg, then we would expect the weight of that cat's heart to increase by 4.034 grams.  However, this was not an experiment which evaluated the weights of cats and their hearts over time -- it was an observational study which evaluated the weights across 144 cats, presumably at the same time.  Therefore it would not be appropriate to make this statement.
+
+```{r 730c, eval=T}
+
+```
+
+
+### ***(d) Interpret R2.***
+
+##### As the $R^2$ measures more than 64 percent, this indicates a strong association between the overall weight of a cat vs. the weight of its heart, with the body weight explaining 64 percent of the variability of the heart weight.
+
+```{r 730d, eval=T}
+
+```
+
+
+### ***(e) Calculate the correlation coefficient.***
+
+```{r p730e, eval=T}
+p730_R2 <- .6466
+p730_correlation = sqrt(p730_R2)
+p730_correlation
+
+cor(cats$Bwt,cats$Hwt)
+```
+
+##### The correlation coefficient is 0.8041 .
+
+
+
+### #.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.
+
+## Exercise  7.40 Rate my professor. 
+
+### ***Many college courses conclude by giving students the opportunity to evaluate the course and the instructor anonymously.***
+
+### ***However, the use of these student evaluations as an indicator of course quality and teaching effectiveness is often criticized because these measures may reflect the influence of non-teaching related characteristics, such as the physical appearance of the instructor.***
+
+### ***Researchers at University of Texas, Austin collected data on teaching evaluation score (higher score means better) and standardized beauty score (a score of 0 means average, negative score means below average, and a positive score means above average) for a sample of 463 professors.***
+
+##### **Daniel S Hamermesh and Amy Parker. “Beauty in the classroom: Instructors pulchritude and putative pedagogical productivity”. In: Economics of Education Review 24.4 (2005), pp. 369–376.**
+
+### ***The scatterplot below shows the relationship between these variables, and also provided is a regression output for predicting teaching evaluation score from beauty score.***
+
+
+```{r p740, eval=T}
+# look at the exact data set referenced
+data("prof.evaltns.beauty.public")
+summary(prof.evaltns.beauty.public)
+```
+
+
+### ***(a) Given that the average standardized beauty score is -0.0883 and average teaching evaluation score is 3.9983, calculate the slope. Alternatively, the slope may be computed using just the information provided in the model summary table.***
+
+##### The slope can be computed from the summary table by multiplying the t-value by the standard error, i.e., 4.13 * .0322 = 0.133
+
+##### Alternatively, the slope can also be computed by recognizing that it is 
+$$b_1 = \frac{y-\bar{y}}{x-\bar{x}}=\frac{4.010-3.9983}{0-(-0.0883)}=\frac{0.0117}{0.0883} = 0.133$$
+```{r 740a, eval=T}
+print("Beauty:")
+beauty = prof.evaltns.beauty.public$btystdave
+t(t(summary(beauty)))
+
+print("Evaluations:")
+eval = prof.evaltns.beauty.public$courseevaluation
+t(t(summary(eval)))
+```
+
+```{r ratingmodel, eval=T}
+ratingmodel <- lm(eval~beauty)
+summary(ratingmodel)
+```
+
+```{r plotratingmodel, eval=T}
+plot(eval~beauty, col="blue")
+abline(ratingmodel, col="red")
+title(main="impact of instructor beauty on students' evaluations of the instructor")
+```
+
+### ***(b) Do these data provide convincing evidence that the slope of the relationship between teaching evaluation and beauty is positive? Explain your reasoning.***
+
+##### Yes, because the slope of 0.133 has a standard error of 0.0322 which means that it is 4.13 standard deviations away from zero (which is also indicated).  This means that a confidence interval about the point estimate of the slope would be approximately (.0686 , .1974 ), again, not covering zero. Furthermore, the p-value shown in the regression summary is 0.0000 which means that the null hypothesis -- that the slope is not different from zero -- is rejected in favor of the alternative.
+
+```{r 740b, eval=T}
+
+```
+
+
+
+
+### ***(c) List the conditions required for linear regression and check if each one is satisfied for this model based on the following diagnostic plots.***
+
+##### The conditions required for linear regression include:
+(1) Linearity - the data should show a linear trend.  The data does appear to show a slight trend.
+However, certain tests do not pass:
+
+```{r 740c-linearity, eval=T}
+require(lmSupport)    ## Note:  the "S" is capitalized in the package name
+modelAssumptions(ratingmodel,"LINEAR")
+```
+
+(2) Nearly Normal Residuals - the low p-values indicate that all of the below tests fail.
+```{r test-for-normality, eval=T}
+shapiro.test(ratingmodel$residuals)
+
+ks.test(ratingmodel$residuals,"pnorm",0,sd(sbux_model$residuals))
+
+require(nortest)
+ad.test(ratingmodel$residuals)
+
+require(tseries)
+jarque.bera.test(ratingmodel$residuals)
+```
+(3) Constant variability:  The below test assumes Normality, which failed above, so we shouldn't use it.  But, just for fun, let's have a look:
+
+```{r test-for-homoscedasticity}
+require(olsrr)
+ols_test_breusch_pagan(ratingmodel)
+
+```
+
+
+```{r residplot, eval=T}
+plot(ratingmodel$residuals ~ beauty, col="blue")
+abline(h = 0, lty = 3, col="red", lwd=2)  # adds a horizontal dashed line at y = 0
+title(main="Instructor Beauty rating vs. residual of student evaluation\n(actual minus projected)")
+```
+
+##### Above, the residuals do not show an obvious pattern, so that is OK.
+##### However, there are significantly more residual points above the line (255/463 = 55%) than there are below the line (208/463 = 45%).  Because the sum of all residuals  must add up to zero, it is necessary that the average value of those residual points below the line (-0.494) is significantly larger (in absolute value) that the average value of those residuals above the line (here, +0.403).
+
+```{r histoplot, eval=T}
+hist(ratingmodel$residuals, col="lightblue")
+```
+
+##### Above, the histogram of the residuals indicates a strong skew, which is not consistent with normality.
+
+```{r qq-residuals, eval=TRUE}
+qqnorm(ratingmodel$residuals)
+qqline(ratingmodel$residuals)  # adds diagonal line to the normal prob plot
+```
+
+##### The QQ-plot reveals tails which differ significantly from normality.
+
+(4) Independent Observations
+
+Finally, the "Order of Data Collection" plot (which I am uncertain how to reproduce) does not appear to show any pattern or bias in regard to the impact of such sequence on the corresponding residuals.
+
+### #.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.
+
