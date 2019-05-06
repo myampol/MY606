@@ -1,0 +1,598 @@
+---
+title: "MichaelY - HW8 - Multiple and Logistic regression"
+author: "Michael Y."
+date: "May 5th, 2019"
+output:
+  html_document:
+    css: ./lab.css
+    highlight: pygments
+    theme: cerulean
+  pdf_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+directory = "c:/Users/Michael/DROPBOX/priv/CUNY/MSDS/201902-Spring/DATA606-Jason/Homework"
+knitr::opts_knit$set(root.dir = directory)
+options(scipen = 999, digits = 8, width=100)
+##setwd(directory)
+library(DATA606)
+library(tidyr)
+library(dplyr)
+library(kableExtra)
+library(ggplot2)
+library(psych)
+```
+
+
+```{r setwd,eval=T}
+###setwd("c:/Users/Michael/DROPBOX/priv/CUNY/MSDS/201902-Spring/DATA606-Jason/Homework")
+```
+# Homework - Chapter 8 - Multiple and Logistic Regression (pp.372-394)
+
+### Practice : 8.1, 8.3, 8.7, 8.15, 8.17 (pp.395-404)
+### Datasets:
+
+#### 8.1 - babies
+#### 8.3 - babies
+#### 8.7 - babies
+#### 8.15 - possum
+#### 8.17 - possum
+
+### ***Exercises: 8.2, 8.4, 8.8, 8.16, 8.18 (pp.395-404)***
+### Datasets:
+
+#### 8.2 - babies
+#### 8.4 - absenteeism
+#### 8.8 - absenteeism
+#### 8.16 - orings
+#### 8.18 - orings
+
+### #.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.
+
+## Exercise 8.2 Baby weights, Part II. 
+
+### Exercise 8.1 introduces a data set on birth weight of babies.
+### Another variable we consider is parity, which is 0 if the child is the first born, and 1 otherwise.
+### The summary table below shows the results of a linear regression model for predicting the average birth weight of babies, measured in ounces, from parity.
+
+```{r p802, eval=T}
+# look at the exact data set referenced
+data("babies")
+summary(babies)
+```
+
+
+#### Model
+```{r p802x, eval=T}
+p802model <- lm(bwt ~ parity, data=babies)
+p802model
+summary(p802model)
+```
+
+### ***(a) Write the equation of the regression line.***
+
+$$ \widehat{BirthWeight} = `r p802model$coefficients[1]` - `r abs(p802model$coefficients[2])` \times parity $$
+
+```{r p802a, eval=T}
+
+```
+
+
+
+### ***(b) Interpret the slope in this context, and calculate the predicted birth weight of first borns and others.***
+
+#### The "slope" functions to separate the average birthweight into two horizontal lines:  
+#### For babies who **are** firstborn, their average birth weight is `r p802model$coefficients[1]` ounces.
+#### For babies who are **not** firstborn, their average birth weight is `r sum(p802model$coefficients)` ounces.
+
+#### As such, the "slope" simply adjusts the intercept into separate values for firstborn vs. not firstborn.
+
+```{r p802b, eval=T}
+babies$par="FirstBorn"
+babies$par[babies$parity==1]="NotFirstBorn"
+babies$par2=as.factor(babies$par)
+boxplot(babies$bwt~babies$par2,
+        main="Birth Weight of First Born vs. Subsequent babies",
+        xlab="Birth Order",
+        ylab="Birth Weight (ounces)",
+        col=c("lightblue","green"),
+        show.names=T)
+```
+
+
+
+### ***(c) Is there a statistically significant relationship between the average birth weight and parity?***
+
+#### No, because the p-value is .1052, the relationship is not considered statistically significant.
+
+```{r p802c, eval=T}
+
+```
+
+
+
+### #.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.
+
+## Exercise 8.4 Absenteeism. 
+
+###Researchers interested in the relationship between absenteeism from school and certain demographic characteristics of children collected data from 146 randomly sampled students in rural New SouthWales, Australia, in a particular school year. 
+
+###Below are three observations from this data set.
+
+```{r p804, eval=T}
+# look at the exact data set referenced
+
+#install.packages("MASS")
+#data(package="MASS")
+data(quine, package="MASS")
+summary(quine)
+
+head(quine,n=2)
+tail(quine,n=1)
+```
+
+
+
+
+
+###The summary table below shows the results of a linear regression model for predicting the average number of days absent based on 
+### ethnic background  (**eth**: A - aboriginal,      N - not aboriginal), 
+### sex                (**sex**: F - female,          M - male), and 
+### learner status     (**lrn**: AL - average learner, SL - slow learner).
+
+```{r p804regression, eval=T}
+p804model <- lm(Days ~ Eth + Sex + Lrn, data=quine)
+p804model
+summary(p804model)
+
+```
+
+
+### ***(a) Write the equation of the regression line.***
+
+```{r p804coeff, eval=T}
+p804coefs <- p804model$coefficients
+p804coefs
+
+```
+
+$$ \widehat { Days } \quad =\quad `r p804coefs[1]`  + (`r p804coefs[2]`)I_{{ Eth }_{ (0:Aboriginal) }^{ (1:NotAboriginal) }} + ( `r p804coefs[3]` )I_{Sex_{ (0:female) }^{ (1:male) }} + ( `r p804coefs[4]` )I_{Lrn_{ (0:AverageLearner) }^{ (1:SlowLearner) }} $$
+
+
+```{r p804a,eval=F}
+Q... = mean(quine$Days)
+print("Eth:")
+Q0.. = mean((subset(quine, Eth=="A" ))$Days)
+Q1.. = mean((subset(quine, Eth=="N" ))$Days)
+c(Q0.. , Q1.., -Q0.. + Q1..)
+
+print("Sex:")
+Q.0. = mean((subset(quine, Sex=="F" ))$Days)
+Q.1. = mean((subset(quine, Sex=="M" ))$Days)
+c(Q.0. , Q.1., -Q.0. + Q.1.)
+
+print("Lrn:")
+Q..0 = mean((subset(quine, Lrn=="AL" ))$Days)
+Q..1 = mean((subset(quine, Lrn=="SL" ))$Days)
+c(Q..0 , Q..1, -Q..0 + Q..1)
+
+Q000 = mean((subset(quine, Eth=="A" & Sex=="F" & Lrn=="AL"))$Days)
+Q001 = mean((subset(quine, Eth=="A" & Sex=="F" & Lrn=="SL"))$Days)
+Q010 = mean((subset(quine, Eth=="A" & Sex=="M" & Lrn=="AL"))$Days)
+Q011 = mean((subset(quine, Eth=="A" & Sex=="M" & Lrn=="SL"))$Days)
+Q100 = mean((subset(quine, Eth=="N" & Sex=="F" & Lrn=="AL"))$Days)
+Q101 = mean((subset(quine, Eth=="N" & Sex=="F" & Lrn=="SL"))$Days)
+Q110 = mean((subset(quine, Eth=="N" & Sex=="M" & Lrn=="AL"))$Days)
+Q111 = mean((subset(quine, Eth=="N" & Sex=="M" & Lrn=="SL"))$Days)
+```
+
+
+### ***(b) Interpret each one of the slopes in this context.***
+#### Eth(N):
+#### All other things equal, children who are **not** aboriginal (Eth=N)are expected to be absent on **fewer** days than children who are aboriginal (Eth=A); the difference is `r p804coefs[2]` days
+
+#### Sex(M):
+#### All other things equal, children who are  **MALE** (Sex=M) are expected to be absent on `r p804coefs[3]` **more** days than children who are **FEMALE** (Sex=M) 
+
+#### Lrn(SL):
+#### All other things equal, children who are  **Slow Learners** (Lrn=SL) are expected to be absent on `r p804coefs[4]` **more** days than children who are **Average Learners** (Lrn=AL) 
+
+
+```{r p804b,eval=T}
+
+
+```
+
+
+### ***(c) Calculate the residual for the first observation in the data set: a student who is aboriginal, male, a slow learner, and missed 2 days of school.***
+
+```{r p804c,eval=T}
+p804coefs
+FirstStudent <- quine[1,]
+FirstStudent
+
+# identify which coefficients are to be used, i.e., 
+# (1 for intercept, 1 if NotAboriginal, 1 if Male, 1 if Slow Learner)
+
+# This observation:
+# (1 for intercept, 0 for Aboriginal, 1 for Male, 1 for Slow Learner)
+q = c(1,0,1,1)
+q
+
+# Compute coefficients are to be used (Aboriginal is set to zero, since it's base case)
+p804coefs * q
+
+# compute the dot product
+FirstStudentEstimatedDays <- as.numeric(p804coefs %*% q)
+print(paste("FirstStudentEstimatedDays = ", FirstStudentEstimatedDays))
+
+# display the actual number of days absent
+FirstStudentActualDays <- FirstStudent$Days
+print(paste("FirstStudentActualDays = ", FirstStudentActualDays))
+
+# compute the residual: Actual minus estimated
+ManualFirstStudentResidual <- FirstStudentActualDays - FirstStudentEstimatedDays
+ManualFirstStudentResidual
+
+# compare vs. the value returned by the model
+ModelFirstStudentResidual <- p804model$residuals[1]
+ModelFirstStudentResidual 
+
+
+```
+
+##### For the first student: 
+##### The estimated number of days absent is `r FirstStudentEstimatedDays`
+##### The actual number of days absent was `r FirstStudentActualDays`
+##### The residual for the first student is `r ManualFirstStudentResidual` .
+##### This matches the number returned by the model, which is `r p804model$residuals[1]` .
+
+
+### ***(d) The variance of the residuals is 240.57, and the variance of the number of absent days for all students in the data set is 264.17. Calculate the $R^2$ and the adjusted $R^2$. Note that there are 146 observations in the data set.***
+
+```{r p804d,eval=T}
+
+ResidVariance <- var(p804model$residuals)
+ResidVariance
+
+AbsentDaysVariance <- var(quine$Days)
+AbsentDaysVariance
+
+n = dim(quine)[1]
+n
+
+# calculate the R2 manually
+manual_R2 <- 1 - ResidVariance/AbsentDaysVariance
+manual_R2
+
+# check vs. the value returned by the regression
+model_R2 <- summary(p804model)$r.squared
+model_R2
+
+# calculate the adjR2 manually
+manual_adjR2 <- 1 - ResidVariance/AbsentDaysVariance * (n-1)/(n-3-1)
+manual_adjR2
+
+# check vs. the value returned by the regression
+model_adjR2 <- summary(p804model)$adj.r.squared
+model_adjR2
+```
+
+
+##### The $R^2$ is `r manual_R2` and the $AdjustedR^2$ is `r manual_adjR2` .
+##### These match the values returned by the regression model: `r model_R2` and `r model_adjR2` .
+
+### #.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.
+
+## Exercise 8.8 Absenteeism, Part II. 
+
+### Exercise 8.4 considers a model that predicts the number of days absent using three predictors: ethnic background (**eth**), gender (**sex**), and learner status (**lrn**).
+
+### The table below shows the adjusted R-squared for the model as well as adjusted R-squared values for all models we evaluate in the first step of the backwards elimination process.
+
+```{r p808-tabl, eval=T}
+tabl=data.frame(matrix(
+c(
+c("Fullmodel", 0.0701),
+c("Noethnicity", -0.0033),
+c("Nosex", 0.0676),
+c("No learner status", 0.0723)
+),
+nrow = 4, ncol = 2, byrow = T, 
+dimnames=list(
+c(1,2,3,4),
+c("Model","Adjusted R2")
+)),stringsAsFactors = F)
+tabl
+```
+
+
+### ***Which, if any, variable should be removed from the model first?***
+
+#### The variable **"Learner Status"** (`lrn`) should be dropped first, because doing so increases the adjusted-$R^2$ the most.
+
+#### Confirm by running backward-stepwise algorithm:
+
+```{r p804-backward, eval=T}
+# look at the exact data set referenced
+require(olsrr)
+ols_step_backward_p(p804model,prem = .3,details = T)
+```
+
+
+#### Confirmed; `lrn` is removed first.
+
+
+### #.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.
+
+## Exercise  8.16 Challenger disaster, Part I. 
+
+
+### On January 28, 1986, a routine launch was anticipated for the Challenger space shuttle. Seventy-three seconds into the flight, disaster happened: the shuttle broke apart, killing all seven crew members on board. 
+### An investigation into the cause of the disaster focused on a critical seal called an O-ring, and it is believed that damage to these O-rings during a shuttle launch may be related to the ambient temperature during the launch. 
+### The table below summarizes observational data on O-rings for 23 shuttle missions, where the mission order is based on the temperature at the time of the launch. 
+### **Temp** gives the temperature in Fahrenheit, 
+### **Damaged** represents the number of damaged O-rings, and 
+### **Undamaged** represents the number of O-rings that were not damaged.
+
+
+```{r p816, eval=T}
+# look at the exact data set referenced
+data("orings")
+summary(orings)
+orings$undamaged = 6 - orings$damage
+orings
+```
+
+
+### ***(a) Each column of the table above represents a different shuttle mission. Examine these data and describe what you observe with respect to the relationship between temperatures and damaged O-rings.***
+
+```{r p816a, eval=T}
+plot(orings$damage~jitter(orings$temp),
+     xlab="Temperature at launch",
+     ylab="Number of failed O-Rings",
+     main="Failed O-Rings by temperature at launch")
+```
+
+#### For higher temperatures, no o-rings are damaged.  
+#### As temperature decreases, there are cases where 1 o-ring is damaged. 
+#### When temperature is quite low (53 degrees), most of the o-rings are damaged.
+
+### ***(b) Failures have been coded as 1 for a damaged O-ring and 0 for an undamaged O-ring, and a logistic regression model was fit to these data. A summary of this model is given below.***
+
+```{r make-138-obs,eval=T}
+## a messy way to create a 138x2 matrix of (temperature, failure or success)
+## necessary for the regression
+failarray138=array(0,dim=138)
+temperaturearray=array(rep(orings[,"temp"],6),dim=c(1,138))  # 138 entries
+
+failarray23=orings[,2] # 5 1 1 1 0 0 0 0 0 0 1 0 1 0 0 0 0 1 0 0 0 0 0
+fail1=array(unlist(lapply(X = failarray23,FUN = min,1)),dim=23) # 1 1 1 1 0 0 0 0 0 0 1 0 1 0 0 0 0 1 0 0 0 0 0
+failarray23 = failarray23 - fail1 # 4 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+fail2=array(unlist(lapply(X = failarray23,FUN = min,1)),dim=23)
+failarray23 = failarray23 - fail2 # 3 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+fail3=array(unlist(lapply(X = failarray23,FUN = min,1)),dim=23)
+failarray23 = failarray23 - fail3 # 2 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+fail4=array(unlist(lapply(X = failarray23,FUN = min,1)),dim=23)
+failarray23 = failarray23 - fail4 # 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+fail5=array(unlist(lapply(X = failarray23,FUN = min,1)),dim=23)
+failarray23 = failarray23 - fail5 # 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+fail6=array(unlist(lapply(X = failarray23,FUN = min,1)),dim=23)
+failarray138 = array(c(fail1,fail2,fail3,fail4,fail5,fail6),dim=c(1,138))
+failsarray=t(rbind(temperaturearray,failarray138))
+colnames(failsarray)=c("temp","failure")
+fails=data.frame(failsarray)
+
+failsbytemp=fails[order(fails$temp),]
+failsarraybytemp=cbind(failsbytemp$temp,failsbytemp$failure)
+colnames(failsarraybytemp)=c("temp","failure")
+failsbytemp=data.frame(failsarraybytemp)
+```
+
+
+#### Match the model shown in the text
+
+```{r p816b,eval=T}
+
+fail_model=glm(failure~temp, data=failsbytemp,family = binomial)
+summary(fail_model)
+
+logit_predictions=t(t(predict(fail_model)))
+prob_predictions=logistic(logit_predictions)
+predicts = cbind(fails,prob_predictions)
+
+
+```
+
+
+### ***Describe the key components of this summary table in words.***
+
+#### The model estimates the logit of the probability that an o-ring will fail.
+#### A positive value for the logit corresponds to a probability greater than 0.5, while a negative value for the logit corresponds to a probability of failure lower than 0.5 .
+#### The logistic function converts from the logit to the probability, using the formula 
+
+$$ \hat{p_i} = \frac { e^{logit(\hat{p_i} )}}{1+e^{logit(\hat{p_i} )}} $$
+
+#### The value `11.6630` for the intercept indicates the value of the logit if the temperature were zero.
+#### This would correspond to a probability of failure of `r logistic(11.6630)` , which is near certainty.
+
+#### The value `-0.2162` measures the estimated reduction in the value of the logit for each degree increase in temperature above zero, where the scale is in fahrenheit.
+
+#### This means that at a temperature of about 54 degrees the logit would be zero, which would correspond to a probabilty of failure of 0.5 .  The higher the temperature, the smaller the value of the logit, which corresponds to a successive reduction in the probability of failure.
+
+#### The standard error of 3.2963 measures the dispersion of the estimate of the intercept, 
+#### while the standard error of 0.0352 measures the dispersion of the estimated coefficient on the temperature.
+#### Given that there are a total of n=138 observations (there are 23 missions, with 6 o-rings on each mission, for a total of 6*23 = 138), the standard error is calculated as 
+$$ std.error = \frac{std.deviation}{\sqrt{138}} $$
+
+#### The Z-value is simply the estimate divided by the standard error, or 
+
+$$ z.value = \frac{estimate}{std.error} $$
+
+#### which measures how many standard deviations the estimate is away from the zero.
+#### In this case, the estimate for the intercept is $\frac{11.6630}{3.2963}=3.54$ standard deviations above zero, while the estimate for the temperatire is $\frac{3.2963}{0.0532}=-4.07$ standard deviations below zero .
+
+#### The Pr(>|z|), also known as the p-value, is the measure of the area under the tail from the Z.value to the corresponding end of the distribution.  In each case, the value is close to zero.  This indicates that the result is statistically significant.
+
+
+
+```{r p816bb, eval=T}
+
+```
+
+
+### ***(c) Write out the logistic model using the point estimates of the model parameters.***
+
+$$ logit(\hat{p_i})=ln \left( \frac{\hat{p_i}}{1-\hat{p_i}} \right) = 11.6630 - 0.2162 \times temperature_i$$
+
+```{r p816c, eval=T}
+
+```
+
+
+### ***(d) Based on the model, do you think concerns regarding O-rings are justified? Explain.***
+
+#### Yes, at lower temperatures, O-rings appear to be more likely to fail.
+
+```{r p816d, eval=T}
+
+
+```
+
+
+### #.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.
+
+## Exercise  8.18 Challenger disaster, Part II. 
+
+Exercise 8.16 introduced us to O-rings that were identified as a plausible explanation for the breakup of the Challenger space shuttle 73 seconds into takeoff in 1986. 
+
+The investigation found that the ambient temperature at the time of the shuttle launch was closely related to the damage of O-rings, which are a critical component of the shuttle. 
+
+See this earlier exercise if you would like to browse the original data.
+
+```{r p818-graph1, eval=T}
+orings$failure=orings$damage/6.0
+plot(orings$failure~jitter(orings$temp),  col="blue",
+     xlab="Temperature (Fahrenheit)",
+     ylab="Probability of damage",
+     main="O-Rings-Probability of Damage by Temperature at launch"
+)
+```
+
+### ***(a) The data provided in the previous exercise are shown in the plot. The logistic model fit to these data may be written as***
+
+$$ log \left( \frac { \hat { p }  }{ 1-\hat { p }  } \right) =\quad 11.6630\quad -\quad (0.2162)Temperature $$
+
+where $\hat{p}$ is the model-estimated probability that an O-ring will become damaged. 
+
+Use the model to calculate the probability that an O-ring will become damaged at each of the following
+ambient temperatures: 51, 53, and 55 degrees Fahrenheit. 
+
+```{r p818-make-3-predictions, eval=T}
+
+# make a temperature list of the three temperatures requested
+temperature_list = seq(51,55,2)
+temperature_list
+
+# predict the logit for each of the three temperatures
+logit_preds = predict.glm(fail_model,newdata=data.frame(temp=temperature_list))
+names(logit_preds) = temperature_list
+logit_preds
+
+# The desired probabilities for the three temperatures
+prob_preds = logistic(logit_preds)
+
+print("The desired probabilities are:")
+print(t(t(prob_preds)))
+
+```
+
+#### The desired probabilities at temperatures (`r temperature_list`) are (`r prob_preds`) .
+
+```{r p818-compute-probs-manually, eval=T}
+# compute the probabilities from the equation rather than the model
+
+manual_probs = logistic(11.6630 - (0.2162) * temperature_list)
+manual_probs
+```
+
+The model-estimated probabilities for several additional ambient temperatures are provided below, where subscripts indicate the temperature:
+
+$$\hat{p}_{57} = 0.341$$ 
+$$\hat{p}_{59} = 0.251$$ 
+$$\hat{p}_{61} = 0.179$$ 
+$$\hat{p}_{63} = 0.124$$
+$$\hat{p}_{65} = 0.084$$ 
+$$\hat{p}_{67} = 0.056$$ 
+$$\hat{p}_{69} = 0.037$$ 
+$$\hat{p}_{71} = 0.024$$
+
+#### Repeat the above, using the entire range of applicable temperatures:
+```{r p818-make-11-predictions, eval=T}
+
+# make a temperature list of the three temperatures requested
+temperature_list = seq(51,81,2)
+temperature_list
+
+# predict the logit for each of the three temperatures
+logit_preds = predict.glm(fail_model,newdata=data.frame(temp=temperature_list))
+names(logit_preds) = temperature_list
+logit_preds
+
+# The desired probabilities for the three temperatures
+prob_preds = logistic(logit_preds)
+
+print("The desired probabilities are:")
+print(t(t(prob_preds)))
+
+```
+
+#### plot the predicted values from the model
+```{r p818a, eval=T}
+logit_predictions=t(t(predict(fail_model)))
+prob_predictions=logistic(logit_predictions)
+predicts = cbind(failsbytemp,prob_predictions)
+plot(predicts$temp,predicts$prob_predictions,col="red")
+lines(predicts$temp,predicts$prob_predictions,type="l",col="red")
+
+```
+
+
+### ***(b) Add the model-estimated probabilities from part (a) on the plot, then connect these dots using a smooth curve to represent the model-estimated probabilities.***
+
+#### Here's a plot incorporating both the probability points (from top, in blue) as well as the predictions (in red) on a single graph:
+
+```{r p818b, eval=T}
+#plot.new()
+plot(orings$failure~jitter(orings$temp),  col="blue",
+     xlab="Temperature (Fahrenheit)",
+     ylab="Probability of damage",ylim=c(0,1),
+     main="O-Rings-Probability of Damage by Temperature at launch",
+     pch=19
+)
+points(predicts$temp,predicts$prob_predictions,col="red",pch=18)
+lines(predicts$temp,predicts$prob_predictions,col="red",lty=1)
+legend(x=65, y=0.7, legend=c("Actual", "Prediction"),
+       cex=0.8,
+       pch = c(19, 18), lty = c(NA, 1),
+       col = c("blue", "red"), text.col = c("blue", "red"))
+
+
+```
+
+
+### ***(c) Describe any concerns you may have regarding applying logistic regression in this application, and note any assumptions that are required to accept the model’s validity.***
+
+#### The use of Logistic Regression does seem reasonable to illustrate the relation of damage to O-rings vs. the temperature at shuttle launch.
+
+#### Here it was necessary to expand the 23-row table of launches, with damaged and undamaged O-ring counts, into a table of 6*23 = 128 rows, indicating the damage or non-damage to each O-ring.  The assumption of independence of the observations is thus compromised, as each group of 6 O-rings were on an individual shuttle launch.  Thus it is to be expected that the results on each O-ring within a group would be similar.
+
+#### Of course, there may be other reasons, apart from temperature, which could cause damage to an O-ring, but those are not considered here.  The upshot is that a shuttle which suffered damage to just a single O-ring was not impacted in the same way as a shuttle which lost 5 O-rings, which resulted in the tragic loss of Challenger in 1986.
+
+
+
+
+
+### #.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.
+
