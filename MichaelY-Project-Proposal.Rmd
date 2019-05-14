@@ -1,0 +1,626 @@
+---
+title: "DATA 606 Data Project Proposal"
+author: "Michael Y."
+output:
+  html_document:
+    css: ./reports.css
+    highlight: pygments
+    theme: cerulean
+    toc: yes
+    toc_float: yes
+  pdf_document:
+    toc: yes
+editor_options:
+  chunk_output_type: inline
+---
+
+### Brief Intro
+
+The "Oxford Comma" is the subject of endless debate among grammarians.  It's the comma that precedes the final conjunction in a listing of 3 or more items.  For example, the sentence 
+
+"For breakfast I like to eat cereal, toast, and juice" 
+
+contains the Oxford Comma, while 
+
+"I am planning to invite Tim, Dick and Harry" 
+
+does not.
+
+In cases like the above, there is really no difference in interpretation, but there are notable examples where the lack of an Oxford Comma can produce humorous results, for example:
+
+<center><img src='https://www.verbicidemagazine.com/wp-content/uploads/2011/09/Oxford-Comma.jpg' height=300></center>
+
+Some additional humorous examples include:
+
+<center><img src='https://www.thepoke.co.uk/wp-content/uploads/2015/05/bn2hf3Q.jpg' height=300></center>
+
+On a more serious note, ambiguities in contracts because of the presence or absence of the Oxford Comma have resulted in costly legal disputes, such as
+
+https://www.nytimes.com/2018/02/09/us/oxford-comma-maine.html
+
+
+### Data Preparation
+
+```{r setup, echo=TRUE, results='hide', warning=FALSE, message=FALSE}
+
+# Load libraries
+library(tidyr)
+library(dplyr)
+library(kableExtra)
+library(ggplot2)
+library(psych)
+library(forcats)   ## for releveling of factors
+```
+
+```{r load-data, eval=T}
+# load data from fivethirtyeight
+commadata <- read.csv("https://raw.githubusercontent.com/fivethirtyeight/data/master/comma-survey/comma-survey.csv",na="",stringsAsFactors = T)
+summary(commadata)
+```
+
+
+#### Clean up the names
+```{r cleanup-names, echo=T, eval=T}
+initial_comma_headers <- names(commadata)
+print(initial_comma_headers)
+
+
+###### Clean up the names
+newnames <- c("RespondentID","USES_Oxford","HEARD_Oxford","CARE_Oxford","DATA_Sentence","DATA_Plural","DATA_Care","Grammar_Important","Gender","Age","Income","Education","Location")
+names(commadata) <- newnames
+
+print("Newnames:")
+print(t(t(names(commadata))))
+```
+
+
+#### [1] `RespondentID` should not impact the results -- it is just an identifier, so drop it
+```{r drop-RespondentID}
+# dimension before dropping
+print(dim(commadata))
+# drop the column
+commadata$RespondentID <- NULL
+# dimension after dropping
+print(dim(commadata))
+```
+
+
+#### [2] Restate Oxford Comma usage response to `True` or `False`
+```{r restate-USES-Oxford, eval=T}
+## [2] The question posed to participants was whether they preferred a sentence using the oxford comma (n=641) or not (n=488),
+t(t(table(commadata$USES_Oxford)))
+#  It's important for a person to be honest, kind and loyal.   488
+#  It's important for a person to be honest, kind, and loyal.  641
+#### Replace the response with False / True:
+levels(commadata$USES_Oxford) <- c(F,T)
+print("Does the respondent prefer to use the Oxford Comma?")
+t(t(summary(commadata$USES_Oxford)))
+#FALSE  TRUE 
+#  488   641
+
+```
+
+#### [4] Resequence the levels for the responses to reflect how much does the participant ***care about*** the Oxford Comma?
+```{r care-about-resequence, eval=T}
+# First ten observations:
+t(t(head(commadata$CARE_Oxford,10)))
+
+# Summary table (sequence is not ordinal):
+t(t(table(commadata$CARE_Oxford,useNA = "always")))
+
+# What are the original levels on the CARE_Oxford variable?
+t(t(levels(commadata$CARE_Oxford)))
+
+### use fct_relevel from library `forcats` to sort the CARE_Oxford levels ordinally
+commadata$CARE_Oxford = fct_relevel(commadata$CARE_Oxford, levels(commadata$CARE_Oxford)[c(2,3,4,1)])
+
+t(t(levels(commadata$CARE_Oxford)))
+
+t(t(summary(commadata$CARE_Oxford)))      # resequenced to reflect ordering from  "Not at all" to "A lot"
+
+### Make sure the results are still same
+
+print("CARE_oxford levels:")
+t(t(table(commadata$CARE_Oxford,useNA = "always")))
+t(t(head(commadata$CARE_Oxford,10)))
+
+```
+#### [5] Grammatical questions on usage of word "Data"
+
+```{r Questions-on-Data-Singular-Plural, eval=T}
+### [5] Another question asked users whether they think the word "data" should be considered singular or plural.
+
+t(t(table(commadata$DATA_Sentence,useNA = "always")))
+#  Some experts say it's important to drink milk, but the data are inconclusive.  228
+#  Some experts say it's important to drink milk, but the data is inconclusive.   865
+
+### Replace the above sentences with the word "PLURAL" or "SINGULAR" to reflect user preference
+levels(commadata$DATA_Sentence) <- c("PLURAL","SINGULAR")
+t(t(summary(commadata$DATA_Sentence)))
+# PLURAL    228
+# SINGULAR  865
+# NA's       36
+```
+
+#### [7] Resequence the levels for the responses to reflect how much does the participant care about whether "Data" is considered Singular or Plural
+```{r Data-care-about-resequence, eval=T}
+# First ten observations:
+t(t(head(commadata$DATA_Care,10)))
+
+# Summary table (sequence is not ordinal):
+t(t(table(commadata$DATA_Care,useNA = "always")))
+
+# What are the original levels on the DATA_Care variable?
+t(t(levels(commadata$DATA_Care)))
+
+### use fct_relevel from library `forcats` to sort the DATA_Care levels ordinally
+commadata$DATA_Care = fct_relevel(commadata$DATA_Care, levels(commadata$DATA_Care)[c(2,3,4,1)])
+
+t(t(levels(commadata$DATA_Care)))
+
+t(t(summary(commadata$DATA_Care)))      # resequenced to reflect ordering from  "Not at all" to "A lot"
+
+### Make sure the results are still same
+
+print("DATA_Care levels:")
+t(t(table(commadata$DATA_Care,useNA = "always")))
+t(t(head(commadata$DATA_Care,10)))
+
+```
+
+#### [8] Resequence the levels for the the responses to ***Importance of Proper Use of Grammar***?
+```{r grammar-important-resequence, eval=T}
+# Incoming table of Grammar_Important responses:
+t(t(table(commadata$Grammar_Important,useNA = "always")))
+
+# First 10 responses:
+t(t(head(commadata$Grammar_Important,10)))
+
+# What are the original levels on the Grammar_Important variable?
+t(t(levels(commadata$Grammar_Important)))
+
+### use fct_relevel from library `forcats` to sort the Grammar_Important levels ordinally
+commadata$Grammar_Important = fct_relevel(commadata$Grammar_Important, levels(commadata$Grammar_Important)[c(5,3,1,2,4)])
+
+# Resequenced levels:
+t(t(levels(commadata$Grammar_Important)))
+
+# Summary table:
+t(t(summary(commadata$Grammar_Important)))  # resequenced to reflect ordering from "very unimportant" to "very important"
+
+### Make sure the results are still same
+
+# Grammar_Important levels:
+t(t(table(commadata$Grammar_Important,useNA = "always")))
+
+# First ten entries:
+t(t(head(commadata$Grammar_Important,10)))
+
+```
+
+
+#### [10] Fix the `Age` variable - resequence the levels, and create a numeric equivalent, based upon the midpoints
+```{r fix-Age, eval=T}
+# First ten entries from the Age variable:
+t(t(head(commadata$Age,10)))
+
+# Save the Age bands
+commadata$AgeBands <- commadata$Age
+
+# What are the original levels on the Age variable?
+t(t(levels(commadata$Age)))
+
+### use fct_relevel from library `forcats` to sort the age levels ordinally
+commadata$AgeBands = fct_relevel(commadata$AgeBands, levels(commadata$Age)[c(2,3,4,1)])
+
+# What are the resequenced levels on the Age variable?
+t(t(levels(commadata$AgeBands)))
+
+### Make sure the results are still same
+
+# Age bands:
+t(t(table(commadata$AgeBands,useNA = "always")))
+
+# First ten entries:
+t(t(head(commadata$AgeBands,10)))
+
+#### Let's replace the above Age ranges with their midpoints, so we can treat Age as a numeric variable rather than as categorical (for "> 60" , we'll arbitrarily use 65 for the right-censored data)
+
+commadata$AgeNumeric <- commadata$AgeBands
+levels(commadata$AgeNumeric) <- c(23.5,37,52.5,65)   ## 18-29 ; 30-44 ; 45-60 ; Over 60 
+
+print("Age table (B):")
+t(t(table(commadata$AgeNumeric,useNA = "always")))
+str(commadata$AgeNumeric)
+
+# First ten entries:
+t(t(head(commadata$AgeNumeric,10)))
+
+# Replace the above string values with their numeric equivalents
+commadata$AgeNumeric <- as.numeric(levels(commadata$AgeNumeric))[commadata$AgeNumeric]
+print("Age table (C):")
+t(t(table(commadata$AgeNumeric,useNA = "always")))
+str(commadata$AgeNumeric)
+
+# First ten entries:
+t(t(head(commadata$AgeNumeric,10)))
+
+```
+
+
+#### [11] Fix the `Income` variable - resequence the levels, and create a numeric equivalent, based upon the midpoints
+```{r fix-Income, eval=T}
+t(t(head(commadata$Income,10)))
+
+# Save the income bands (for later)
+commadata$IncomeBands <- commadata$Income
+
+# What are the original levels on the income variable?
+t(t(levels(commadata$Income)))
+
+### use fct_relevel from library forcats to sort the income levels ordinally
+commadata$IncomeBands = fct_relevel(commadata$IncomeBands, levels(commadata$IncomeBands)[c(1,4,5,2,3)])
+
+t(t(levels(commadata$IncomeBands)))
+
+### Make sure the results are still same
+
+print("Income bands:")
+t(t(table(commadata$IncomeBands,useNA = "always")))
+t(t(head(commadata$IncomeBands,10)))
+
+#### Let's replace the above income ranges with their midpoints, so we can treat income as a numeric variable rather than as categorical (for $150,000+ , we'll arbitrarily use $160,000 for the right-censored data)
+
+commadata$IncomeNumeric <- commadata$IncomeBands
+levels(commadata$IncomeNumeric) <- c(12500,37500,75000,125000,160000)
+
+print("Income table (B):")
+t(t(table(commadata$IncomeNumeric,useNA = "always")))
+str(commadata$IncomeNumeric)
+t(t(head(commadata$IncomeNumeric,10)))
+
+# Replace the values with their numeric equivalents
+commadata$IncomeNumeric <- as.numeric(levels(commadata$IncomeNumeric))[commadata$IncomeNumeric]
+print("Income table (C):")
+t(t(table(commadata$IncomeNumeric,useNA = "always")))
+str(commadata$IncomeNumeric)
+t(t(head(commadata$IncomeNumeric,10)))
+
+```
+
+#### [12] Resequence the levels for the ***Education*** variable
+```{r Education-resequence, eval=T}
+print("Incoming table of Education responses:")
+t(t(table(commadata$Education,useNA = "always")))
+print("First 10 responses:")
+t(t(head(commadata$Education,10)))
+
+# What are the original levels on the Education variable?
+t(t(levels(commadata$Education)))
+#[1,] "Bachelor degree"                 
+#[2,] "Graduate degree"                 
+#[3,] "High school degree"              
+#[4,] "Less than high school degree"    
+#[5,] "Some college or Associate degree"  
+
+
+### use fct_relevel from library forcats to sort the Education levels ordinally
+commadata$Education = fct_relevel(commadata$Education, levels(commadata$Education)[c(4,3,5,1,2)])
+
+t(t(levels(commadata$Education)))
+
+t(t(summary(commadata$Education)))              # resequenced to reflect ordering from "Less than high school degree" to "Graduate degree"
+
+### Make sure the results are still same
+
+print("Education levels:")
+t(t(table(commadata$Education,useNA = "always")))
+t(t(head(commadata$Education,10)))
+
+```
+
+#### [12] Resequence the levels for the ***Location*** variable to reflect geography (east to west)
+```{r Location-resequence, eval=T}
+print("Incoming table of Location responses:")
+t(t(table(commadata$Location,useNA = "always")))
+print("First 10 responses:")
+t(t(head(commadata$Location,10)))
+
+# What are the original levels on the Location variable?
+t(t(levels(commadata$Location)))
+# [1,] "East North Central"
+# [2,] "East South Central"
+# [3,] "Middle Atlantic"   
+# [4,] "Mountain"          
+# [5,] "New England"       
+# [6,] "Pacific"           
+# [7,] "South Atlantic"    
+# [8,] "West North Central"
+# [9,] "West South Central"  
+
+
+### use fct_relevel from library forcats to sort the Location levels so they reflect geography from East to West
+commadata$Location = fct_relevel(commadata$Location, levels(commadata$Location)[c(5,3,7,1,2,8,9,4,6)])
+
+t(t(levels(commadata$Location)))
+
+t(t(summary(commadata$Location)))              # resequenced to reflect ordering from east cost to west coast
+
+### Make sure the results are still same
+
+print("Location levels:")
+t(t(table(commadata$Location,useNA = "always")))
+t(t(head(commadata$Location,10)))
+
+```
+
+
+#### Let's drop the "DATA (singular vs. plural)" questions from the analysis:
+```{r drop-DATA-responses, eval=T}
+commadata$DATA_Sentence <- NULL
+commadata$DATA_Plural <- NULL
+commadata$DATA_Care <- NULL
+
+# Dimension after dropping the above variables
+dim(commadata)
+```
+
+
+
+#### Drop cases containing NAs
+
+```{r drop-rows-with-NAs}
+summary(commadata)
+# Size of dataframe BEFORE dropping rows containing NAs:
+dim(commadata)
+
+## drop rows which contain any NA values
+comma2 <- commadata[complete.cases(commadata),]
+summary(comma2)
+# Size of dataframe "comma2" AFTER dropping rows containing NAs: 
+dim(comma2)
+
+```
+
+
+
+
+
+         
+
+
+
+
+
+### Research question 
+
+**You should phrase your research question in a way that matches up with the scope of inference your dataset allows for.**
+
+Is there any association between gender, age, income, educational attainment, and geographic region among individuals who choose to use the Oxford Comma?  Which variables provide the strongest support for predicting whether an individual will or will not prefer to use the Oxford Comma?
+
+### Cases 
+
+**What are the cases, and how many are there?**
+
+The dataset contains 1129 cases, each of which represents a response to an online poll conducted in June 2014, where participants were asked various questions, including:
+
+1) whether they knew what the Oxford Comma is, 
+2) which of two sentences (one with the serial comma, and one without) they preferred, and 
+3) whether they believed the use of proper grammar was important.
+
+Additionally, participants were asked questions regarding their gender, age, income, educational attainment, and geographic region.
+
+### Data collection 
+
+**Describe the method of data collection.**
+
+Data was collected using an online poll on the SurveyMonkey.com platform.  The survey was open for three days (June 3-5, 2014).
+There were 1129 participants, however not everyone answered all of the questions. 
+A total of 825 respondents answered all questions.
+Excluding the questions pertaining to whether "Data" is singular or plural, 828 respondents answered all remaining questions.
+
+
+### Type of study 
+
+**What type of study is this (observational/experiment)?**
+
+This is an observational study.
+
+### Data Source 
+
+**If you collected the data, state self-collected. If not, provide a citation/link.**
+
+In June of 2014, `FiveThirtyEight.com` ran an online poll using "surveymonkey.com" asking Americans whether they preferred the serial comma (also known as the `Oxford Comma`.)  
+
+Additional questions were posed regarding the respondents' educational level, income level, age, and what part of the country each was from.  
+
+Additional grammatical questions which were part of the same poll concerned usage of the word "data": respondents were asked whether they considered "data" to be *singular* or *plural*. 
+
+Information on the study is here:  https://fivethirtyeight.com/features/elitist-superfluous-or-popular-we-polled-americans-on-the-oxford-comma/
+
+The data can be sourced from here:
+https://github.com/fivethirtyeight/data/tree/master/comma-survey
+
+
+
+### Dependent Variable
+
+**What is the response variable? Is it quantitative or qualitative?**
+
+The response variable is `USES_Oxford` - it is a True/False variable which indicates whether a subject prefers the use of the Oxford Comma, or not.
+
+### Independent Variable
+
+**You should have two independent variables, one quantitative and one qualitative.**
+
+I am going to implement stepwise logistic regression on all of the variables to determine which are most indicative as to whether an individual prefers the use of the Oxford Comma.  (I will omit the variables pertaining to whether "Data" is singular or plural, as those represent a side question.)
+
+Most significantly, I'll explore whether there is any association favoring the Oxford Comma based upon participant `Age`, `Income`, `Gender`, `Education`, and geographic `Location` .
+
+The variables `Age` and `Income` are quantitative, but not continuous (as the results are given in bands rather than exact values.)
+
+`Gender` and `Location` are qualitative, non-ordinal variables.
+
+`Education` is a qualitative variable, but it is ordinal as the various levels of education can be ranked.
+
+My conjecture would be that users of the Oxford Comma would tend to be younger, higher in income, and higher in education that non-users.
+
+I do not have any prior expectation that `Gender` would impact the results.
+
+It would be interesting to see whether `Location` has any impact on the results, as regional dialects can impact  usage of English in various parts of the country.
+
+
+### Relevant summary statistics 
+
+**Provide summary statistics for each the variables. Also include appropriate visualizations related to your research question (e.g. scatter plot, boxplots, etc). This step requires the use of R, hence a code chunk is provided below. Insert more code chunks as needed.**
+
+#### [2] Does the respondent ***prefer to use*** the oxford comma?
+```{r describe-vars, eval=T}
+t(t(summary(comma2$USES_Oxford)))
+```
+
+```{r do-you-use, eval=T}
+barplot(table(comma2$USES_Oxford),col=c("red","green"),
+        xlab = "Do you prefer to use the Oxford Comma?", ylab = "Frequency", 
+        main = "Oxford Comma usage among respondents to FiveThirtyEight.com poll")
+```
+
+
+#### [3] Has the respondent ***previously heard about*** the Oxford Comma?
+```{r heard-about, eval=T}
+t(t(summary(comma2$HEARD_Oxford)))
+```
+
+
+```{r heard-about-plot, eval=T}
+barplot(table(comma2$HEARD_Oxford),col=c("red","green"),
+        xlab = "Have you previously heard about the Oxford Comma?", ylab = "Frequency", 
+        main = "Oxford Comma awareness among respondents to FiveThirtyEight.com poll")
+```
+
+#### [4] Does the respondent ***care about*** the Oxford Comma?
+```{r care-about, eval=T}
+t(t(summary(comma2$CARE_Oxford))) # already resequenced above to reflect ordering from "A lot" to "Not at all"
+```
+
+```{r care-about-barplot, eval=T, fig.height=6,fig.width=10}
+### Barplot of degree to which respondent cares about the Oxford Comma
+barplot(table(comma2$CARE_Oxford),col=rainbow(4),
+        xlab = "How much do you care?", ylab = "Frequency", 
+        main = "How much do respondents care about the 'Oxford Comma' ?")
+```
+
+```{r heard-about-care-about, eval=T}
+# Have you previously heard about the Oxford Comma vs. how much do you care about it?
+table(comma2$CARE_Oxford,comma2$HEARD_Oxford)
+mosaicplot(comma2$HEARD_Oxford ~ comma2$CARE_Oxford,col=rainbow(4),las=1,
+           xlab="Have you (previously) heard of the Oxford Comma?",
+           ylab="Do you care?",
+           main="'Have you heard' vs. 'Do you care?'")
+```
+
+Respondents who have previously heard of the Oxford Comma are more likely to care about it, while those who have not previously heard about it are less likely.
+
+#### [8] Does the respondent believe that ***correct grammar*** is important?
+```{r grammar-important,eval=T}
+t(t(summary(comma2$Grammar_Important)))      # already resequenced above to reflect ordering
+```
+
+```{r correct-grammar-barplot, eval=T, fig.height=6,fig.width=10}
+### Barplot of importance of correct grammar
+barplot_names = levels(comma2$Grammar_Important)
+barplot_names[3]="Neutral"                          # otherwise this entry is too long
+barplot(table(comma2$Grammar_Important),col=rainbow(5),names.arg = barplot_names,
+        xlab = "Opinion", ylab = "Frequency", 
+        main = "Do you believe that correct grammar is important?")
+```
+
+
+#### [9] What is the respondent's ***gender*** ?
+```{r gender,eval=T}
+t(t(summary(comma2$Gender)))     
+```
+#### Usage of Oxford Comma by gender: Is there any obvious difference?
+```{r gender-mosaicplot, eval=T}
+# Number of each gender using Oxford Comma
+table(comma2$USES_Oxford, comma2$Gender)
+
+# Percentage within each row using the Oxford Comma
+table(comma2$USES_Oxford, comma2$Gender)/rowSums(table(comma2$USES_Oxford, comma2$Gender))
+
+# Percentage within each column using the Oxford Comma
+t(t(table(comma2$USES_Oxford, comma2$Gender))/colSums(table(comma2$USES_Oxford, comma2$Gender)))
+
+mosaicplot(comma2$Gender~ comma2$USES_Oxford, col=c("Red","Green"), 
+           xlab="Gender", ylab="Uses Oxford Comma?",
+           main="Use of Oxford Comma by Gender")
+```
+
+The percentage of each gender using the Oxford Comma is about the same.
+
+
+#### [10] What is the respondent's ***age band***  ?
+```{r age,eval=T}
+t(t(table(comma2$AgeBands,useNA = "ifany")))      # already resequenced to reflect ordering of age bands
+```
+
+```{r age-barplot, eval=T, fig.height=6,fig.width=10}
+### Barplot of age bands
+barplot(table(comma2$AgeBands),col=rainbow(4),space = 1,
+        xlab = "Age Bands", ylab = "Frequency", 
+        main = "Age range of respondents to 'Oxford Comma' survey")
+```
+
+
+#### [11] What is the respondent's ***income band*** ?
+```{r IncomeBands,eval=T}
+t(t(table(comma2$IncomeBands,useNA = "ifany"))) # resequenced to reflect ordering of income bands
+```
+
+```{r income-barplot, eval=T, fig.height=6,fig.width=10}
+### Barplot of income bands
+barplot(table(comma2$IncomeBands),col=rainbow(5),space = 1,
+        xlab = "Income Ranges", ylab = "Frequency", 
+        main = "Income range of respondents to 'Oxford Comma' survey")
+```
+
+The above results appear to resemble a normal distribution.
+
+#### [12] What is the respondent's level of ***education***?
+```{r education, eval=T}
+
+t(t(summary(comma2$Education)))              # already resequenced to reflect ordering of educational attainment
+```
+
+```{r education-barplot, eval=T, fig.height=6,fig.width=14}
+### Barplot of educational attainment
+barplot(table(comma2$Education),col=rainbow(5),space = 1,
+        xlab = "Educational Attainment", ylab = "Frequency", 
+        main = "Educational Attainment of respondents to 'Oxford Comma' survey")
+```
+
+The data is left-skewed, with the median respondent having a bachelor's degree.
+
+
+#### [13] Geography
+```{r geography, eval=T}
+# Where is the respondent located?
+t(t(summary(comma2$Location)))      # already resequenced to reflect geography (east to west)
+EastCoast = summary(comma2$Location)[c(1,2,3)]
+MiddleUSA = summary(comma2$Location)[c(4,5,6,7)]
+WesternUSA = summary(comma2$Location)[c(8,9)]
+```
+
+The respondents are geographically well-distributed across the USA, with `r sum(EastCoast)` from the **East Coast**, `r sum(MiddleUSA)` from the **Central** portion of the country, and `r sum(WesternUSA)` from the **West**.
+
+```{r geography-mosaic, eval=T}
+# Table of Oxford Comma Usage by region
+table(comma2$Location, comma2$USES_Oxford)
+
+# Mosaic Plot
+mosaicplot(data=comma2, USES_Oxford ~ Location, col=rainbow(9), las=1, main = "Oxford Comma Usage by region")
+
+```
+
+
+
