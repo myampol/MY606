@@ -1,0 +1,1436 @@
+---
+title: DATA 606 Data Project
+date: "May 2019"
+author: "Michael Y."
+output:
+  html_document:
+    css: ./project_template.css
+    highlight: pygments
+    theme: cerulean
+    code_folding: hide
+    toc: yes
+    toc_float: yes
+    toc_depth: 3
+  pdf_document:
+    toc: yes
+editor_options:
+  chunk_output_type: inline
+---
+<style>
+  .main-container {
+    max-width: 1200px !important;
+  }
+</style>
+
+```{r include=FALSE, cache=FALSE}
+# code block from openIntro author Mine Centinkaya Rundel's STAT104 course at Duke
+# DO NOT REMOVE
+# THIS IS FOR SETTING SOME PLOTTING PARAMETERS SO THAT YOUR PLOTS DON'T TAKE UP TOO MUCH SPACE
+# IF YOU WOULD LIKE TO CHANGE THESE, SEE HELP FILES ON THE par() FUNCTION
+# OR ASK FOR HELP
+library(knitr)
+## set global chunk options
+opts_chunk$set(fig.path='figure/manual-', cache.path='cache/manual-', fig.align='center', fig.show='hold', par=TRUE)
+## tune details of base graphics (http://yihui.name/knitr/hooks)
+knit_hooks$set(par=function(before, options, envir){
+if (before && options$fig.show!='none') par(mar=c(4,4,4.2,.1),cex.lab=.95,cex.axis=.9,mgp=c(2,.7,0),tcl=-.3)
+})
+```
+
+
+```{r loadup, echo=FALSE, results='hide', warning=FALSE, message=FALSE}
+# Load libraries
+library(tidyr)
+library(dplyr)
+library(kableExtra)
+library(ggplot2)
+library(psych)
+library(forcats)   ## for releveling of factors
+library(DATA606)
+library(vcd)
+library(questionr)
+library(rcompanion)
+
+options(scipen = 999, digits=6, width=140)
+# From OpenIntro (Labs 5 and 6)
+source("./inference.R")
+# Dependency required by inference.R
+source("./chiTail.R")
+```
+
+
+
+```{r knitr-format, echo=FALSE, results='hide', warning=FALSE, message=FALSE}
+# I need to manually switch options depending on what I am knitting, or if I am using in the terminal, to get useful output
+options(knitr.table.format = "html")
+#options(knitr.table.format = "latex")
+#options(knitr.table.format = "markdown")
+directory = "C:/Users/Michael/Dropbox/priv/CUNY/MSDS/201902-Spring/DATA606-Jason/Project"
+knitr::opts_knit$set(root.dir = directory)
+```
+
+
+
+
+
+### ***Part 1 - Introduction***
+
+
+The "Oxford Comma" is the subject of endless debate among grammarians.  It's the comma that precedes the final conjunction in a listing of 3 or more items.  For example, the sentence 
+
+"For breakfast I like to eat cereal, toast, and juice." 
+
+contains the Oxford Comma, while 
+
+"I am planning to invite Tim, Dick and Harry." 
+
+does not.
+
+In cases like the above, there is really no difference in interpretation, but there are notable examples where the lack of an Oxford Comma can produce humorous results. For example:
+
+<center><img src='https://www.verbicidemagazine.com/wp-content/uploads/2011/09/Oxford-Comma.jpg' height=300></center>
+![Source: https://www.verbicidemagazine.com/wp-content/uploads/2011/09/Oxford-Comma.jpg]
+
+Some additional humorous examples include:
+
+<center><img src='https://www.thepoke.co.uk/wp-content/uploads/2015/05/bn2hf3Q.jpg' height=300></center>
+![Source: https://www.thepoke.co.uk/wp-content/uploads/2015/05/bn2hf3Q.jpg]
+
+On a more serious note, ambiguities in contracts because of the presence or absence of the Oxford Comma have resulted in costly legal disputes, such as a case in Maine where truckers for a dairy sued for overtime pay[$^5$](#e) because an ambiguity in Maine law (missing Oxford comma!) made it unclear whether or not they would be paid overtime. 
+
+As originally written, the law carved out an exemption from overtime for:
+
+>The canning, processing, preserving, freezing, drying, marketing, storing, **packing for shipment or distribution** of:
+>
+>(1) Agricultural produce;
+>
+>(2) Meat and fish products; and
+>
+>(3) Perishable foods.
+
+The case hinged upon the absence of a comma between the words "shipment" and "or",  with the drivers contending that the phrase "packing for shipment or distribution of" meant that the overtime exemption only applied to the activity of ***packing*** (for shipment **or** distribution), while the dairy argued that the legislative intent was for ***packing for shipment*** to represent one activity, and ***distribution*** to represent a separate activity.  The drivers do not perform packing, but they do perform distribution.  If the law had been drafted with a comma following the word "shipment" the there would be no ambiguity, and the drivers would have no case. 
+
+Following a favorable ruling [$^7$](#g) from the US Court of Appeals for the First Circuit, the drivers settled their case[$^6$](#f) for a \$5 million payout from the dairy.
+
+Thus, the use of the "Oxford Comma" is important.
+
+In this study we will be looking at a data set in which people from across the USA responded to a survey which inquired as to whether or not they preferred the Oxford Comma.  The survey also collected self-reported data concerning Age, Income, Educational level, Gender, and geographic location.  The purpose of this study will be to determine which of those variables (if any) reveal a strong enough association with the propensity to prefer (or, not prefer) the Oxford Comma.
+
+### ***Part 2 - Data***
+
+#### Data Source 
+#### Data collection: Describe how the data were collected.
+#### **If you collected the data, state self-collected. If not, provide a citation/link.**
+
+In June of 2014, `FiveThirtyEight.com` ran an online poll (using "surveymonkey.com") asking Americans whether they preferred the serial comma (also known as the `Oxford Comma`.)  
+
+Additional questions were posed regarding the respondents' educational level, income level, age, and what part of the country each person was from.  
+
+Additional grammatical questions which were part of the same poll concerned usage of the word "data": respondents were asked whether they considered "data" to be *singular* or *plural*. (Such questions have been omitted from the present analysis.)
+
+Following conclusion of the poll, FiveThirtyEight.com published a piece ***Elitist, Superfluous, Or Popular? We Polled Americans on the Oxford Comma***[$^1$](#a) and made the **underlying dataset**[$^2$](#b) available on github .
+
+##### I loaded up the data from fivethirtyeight's github site.  
+##### The initial variable names were awful:
+
+```{r echo=T, eval=T,  warning=FALSE, message=FALSE}
+# load data from fivethirtyeight
+commadata <- read.csv("https://raw.githubusercontent.com/fivethirtyeight/data/master/comma-survey/comma-survey.csv",na="",stringsAsFactors = T)
+# summary(commadata)
+initial_variable_names <- names(commadata)
+kable(t(rbind(seq(initial_variable_names),initial_variable_names)),caption="Initial variable names")%>%
+  kable_styling(c("striped", "bordered"))
+```
+
+##### So, I cleaned up the variable names:
+```{r manipulate-data-0, echo=T, eval=T}
+
+###### Clean up the names
+new_variable_names <- c("RespondentID",
+                        "USES_Oxford",
+                        "HEARD_Oxford",
+                        "CARE_Oxford",
+                        "DATA_Sentence",
+                        "DATA_Plural",
+                        "DATA_Care",
+                        "Grammar_Important",
+                        "Gender",
+                        "Age",
+                        "Income",
+                        "Education",
+                        "Location")
+names(commadata) <- new_variable_names
+kable(t(rbind(seq(new_variable_names),new_variable_names)),caption="New variable names")%>%
+  kable_styling(c("striped", "bordered"))
+
+```
+
+
+#### **What are the cases, and how many are there?**  (Remember: case = units of observation or units of experiment)
+
+The raw dataset contains `r dim(commadata)[1]` cases, each of which represents a response to an online poll conducted in June 2014, where participants were asked various questions, including:
+
+1) whether they knew what the Oxford Comma is, 
+2) which of two sentences (one with the serial comma, and one without) they preferred, and 
+3) whether they believed the use of proper grammar was important.
+
+Additionally, participants were asked questions regarding their gender, age, income, educational attainment, and geographic region.
+
+The overall dataset includes the following variables and possible responses:
+
+n |variable           | question or description         | type       | data dictionary
+|:-:|:----------------:|:-------------------------------:|:----------:|:-------------:|
+ 1 |`RespondentID`     | numerical ID of participant | numerical, discrete |unique identifiers assigned by the survey site (surveymonkey.com)
+ 2 |`USES_Oxford`      |"In your opinion, which sentence is more gramatically correct?" | categorical, nominal | 1-"It's important for a person to be honest, kind and loyal." 2-"It's important for a person to be honest kind and loyal."
+ 3 |`HEARD_Oxford`     | "Prior to reading about it above, had you heard of the serial (or Oxford) comma?" | categorical, binary | "No", "Yes"
+ 4 |`CARE_Oxford`      | "How much, if at all, do you care about the use (or lack thereof) of the serial (or Oxford) comma in grammar?" | categorical, ordinal | "Not at All" , "Not Much" , "Some" , "A lot"
+ 5 |`DATA_Sentence`    |"How would you write the following sentence?" (One uses "Data" as singular, the other as plural) | categorical, binary | Plural: "Some experts say it's important to drink milk, but the data are inconclusive." ; Singular: "Some experts say it's important to drink milk, but the data is inconclusive."
+ 6 |`DATA_Plural`      |"When faced with using the word 'data', have you ever spent time considering if the word was a singular or plural noun?"|categorical, binary | "Yes", "No"
+ 7 |`DATA_Care`        |"How much, if at all, do you care about the debate over the use of the word 'data' as a singluar or plural noun?" | categorical, ordinal | "Not at All" , "Not Much" , "Some" , "A lot"
+ 8 |`Grammar_Important`|"In your opinion, how important or unimportant is proper use of grammar?" |Categorical, ordinal|"Very unimportant", "Somewhat unimportant", "Neither important nor unimportant (neutral)", "Somewhat important", "Very important"
+ 9 |`Gender`           |Participant's gender (only "Male" and "Female" choices offered)|Categorical, binary| "Female", "Male"
+10 |`AgeBands`              |Participant's age, in one of four bands                        |Categorical, ordinal| "18-29", "30-44", "45-60", "> 60"
+11 |`IncomeBands`           |Participant's household income, in one of five bands           |Categorical, ordinal| "\$0     -\$24,999" , "\$25,000-\$49,999" , "\$50,000-\$99,999" , "\$100,000-\$149,999" , "\$150,000+"
+12 |`Education`        |Participant's level of education, in one of five categories    |Categorical, ordinal| "Less than high school degree", "High school degree", Some college or Associate degree", "Bachelor degree", "Graduate degree"
+13 |`Location`         |Participant's geographic location, in one of 9 regions         |Categorical, nominal| "New England","Middle Atlantic","South Atlantic"," East North Central","East South Central","West North Central","West South Central","Mountain","Pacific"
+
+#### I made various adjustments to the initial data, including: 
+
+#### Dropping variable [1] `RespondentID`, as it is not needed
+```{r manipulate-data-1}
+#### [1] `RespondentID` should not impact the results -- it is just an identifier, so drop it
+commadata$RespondentID <- NULL
+```
+
+#### Recategorizing [2] `USES_Oxford` variable as "True" or "False"
+```{r manipulate-data-2}
+# [2] The question posed to participants was whether they preferred a sentence using the Oxford Comma
+
+#t(t(table(commadata$USES_Oxford)))
+#  It's important for a person to be honest, kind and loyal.   488
+#  It's important for a person to be honest, kind, and loyal.  641
+#### Replace the response with False / True:
+levels(commadata$USES_Oxford) <- c(F,T)
+kable(table(commadata$USES_Oxford,useNA = "ifany"),
+      col.names=c("Did the respondent prefer the sentence containing the Oxford Comma?","Freq"),
+      caption="Variable `USES_Oxford`") %>%
+    kable_styling(c("striped", "bordered"))
+```
+
+
+#### Resequencing the (unordered) levels for [4] `CARE_Oxford` to reflect the ordering:
+```{r manipulate-data-4, echo=T} 
+# [4] Resequence the levels for the responses to reflect how much does the participant ***care about*** the Oxford Comma?
+# First ten observations:
+# t(t(head(commadata$CARE_Oxford,10)))
+# Summary table (sequence is not ordinal):
+# kable(table(commadata$CARE_Oxford,useNA = "ifany"),format="markdown")
+
+# What are the original levels on the CARE_Oxford variable?
+# t(t(levels(commadata$CARE_Oxford)))
+
+### use fct_relevel from library `forcats` to sort the CARE_Oxford levels ordinally
+commadata$CARE_Oxford = fct_relevel(commadata$CARE_Oxford, levels(commadata$CARE_Oxford)[c(2,3,4,1)])
+
+#### Don't use Ordinal variable in the regression because the result is handled differently than one would expect...
+#is.ordered(commadata$CARE_Oxford)
+#commadata$CARE_Oxford=ordered(commadata$CARE_Oxford)
+#is.ordered(commadata$CARE_Oxford)
+# Now, "ordered":
+#summary(glm(USES_Oxford ~ CARE_Oxford , data = commadata, family=binomial))
+
+#t(t(levels(commadata$CARE_Oxford)))
+#t(t(summary(commadata$CARE_Oxford)))      # resequenced to reflect ordering from  "Not at all" to "A lot"
+
+
+kable(table(commadata$CARE_Oxford,useNA = "ifany"),
+      col.names=c("How much do you care about the Oxford Comma?","Freq"),
+      caption="Variable `CARE_Oxford`") %>%
+    kable_styling(c("striped", "bordered"))
+
+```
+
+#### Recategorizing the responses to [5] `DATA_Sentence` to reflect "PLURAL" or "SINGULAR"
+```{r manipulate-data-5}
+# [5] Another question asked users whether they think the word "data" should be considered singular or plural.
+
+#t(t(table(commadata$DATA_Sentence,useNA = "ifany")))
+#  Some experts say it's important to drink milk, but the data are inconclusive.  228
+#  Some experts say it's important to drink milk, but the data is inconclusive.   865
+
+### Replace the above sentences with the word "PLURAL" or "SINGULAR" to reflect user preference
+
+levels(commadata$DATA_Sentence) <- c("PLURAL","SINGULAR")
+
+kable(table(commadata$DATA_Sentence,useNA = "ifany"),
+      col.names=c("Do you consider the word 'DATA' to be Plural or Singular?","Freq"),
+      caption="Variable `DATA_Sentence`") %>%
+    kable_styling(c("striped", "bordered"))
+
+```
+
+#### Resequencing the (unordered) levels for [7] `DATA_Care` to reflect the ordering:
+```{r manipulate-data-7}
+
+#### [7] Resequence the levels for the responses to reflect how much does the participant care about whether "Data" is considered Singular or Plural
+
+# First ten observations:
+#t(t(head(commadata$DATA_Care,10)))
+
+# Summary table (sequence is not ordinal):
+#t(t(table(commadata$DATA_Care,useNA = "ifany")))
+
+# What are the original levels on the DATA_Care variable?
+#t(t(levels(commadata$DATA_Care)))
+
+### use fct_relevel from library `forcats` to sort the DATA_Care levels ordinally
+commadata$DATA_Care = fct_relevel(commadata$DATA_Care, levels(commadata$DATA_Care)[c(2,3,4,1)])
+
+#t(t(levels(commadata$DATA_Care)))
+
+#t(t(summary(commadata$DATA_Care)))      # resequenced to reflect ordering from  "Not at all" to "A lot"
+
+### Make sure the results are still same
+
+#print("DATA_Care levels:")
+#t(t(table(commadata$DATA_Care,useNA = "ifany")))
+#t(t(head(commadata$DATA_Care,10)))
+
+
+
+kable(table(commadata$DATA_Care,useNA = "ifany"),
+      col.names=c("How much do you care about the debate over the use of the word 'data' as singular vs. plural?","Freq"),
+      caption="Variable `DATA_Care`") %>%
+    kable_styling(c("striped", "bordered"))
+
+```
+
+#### Resequencing the (unordered) levels for [8] `Grammar_Important` to reflect the ordering:
+```{r manipulate-data-8}
+
+#### [8] Resequence the levels for the the responses to ***Importance of Proper Use of Grammar***?
+
+# What are the original levels on the Grammar_Important variable?
+# t(t(levels(commadata$Grammar_Important)))
+
+# Shorten "Neither important nor unimportant (neutral)" to "Neutral" to avoid printing/display width problems
+levels(commadata$Grammar_Important)[1]="Neutral"
+
+### use fct_relevel from library `forcats` to sort the Grammar_Important levels ordinally
+commadata$Grammar_Important = fct_relevel(commadata$Grammar_Important, levels(commadata$Grammar_Important)[c(5,3,1,2,4)])
+
+# Resequenced levels:
+# t(t(levels(commadata$Grammar_Important)))
+
+kable(table(commadata$Grammar_Important,useNA = "ifany"),
+      col.names=c("In your opinion, how important or unimportant is proper use of grammar?","Freq"),
+      caption="Variable `Grammar_Important`") %>%
+    kable_styling(c("striped", "bordered"))
+
+```
+
+#### Resequencing the (unordered) levels for [10] `AgeBands` to reflect the ordering of the bands:  
+```{r manipulate-data-10}
+
+#### [10] Fix the `Age` variable - resequence the levels, and create a numeric equivalent, based upon the midpoints
+
+# First ten entries from the Age variable:
+#t(t(head(commadata$Age,10)))
+
+# Save the Age bands
+commadata$AgeBands <- commadata$Age
+
+# What are the original levels on the Age variable?
+#t(t(levels(commadata$Age)))
+
+### use fct_relevel from library `forcats` to sort the age levels ordinally
+commadata$AgeBands = fct_relevel(commadata$AgeBands, levels(commadata$Age)[c(2,3,4,1)])
+
+# What are the resequenced levels on the Age variable?
+#t(t(levels(commadata$AgeBands)))
+
+### Make sure the results are still same
+
+# Age bands:
+#t(t(table(commadata$AgeBands,useNA = "ifany")))
+
+# First ten entries:
+#t(t(head(commadata$AgeBands,10)))
+
+kable(table(commadata$AgeBands,useNA = "ifany"),
+      col.names=c("Age Band","Freq"),
+      caption="Variable `AgeBands`") %>%
+    kable_styling(c("striped", "bordered"))
+```
+
+#### Additionally, I created a new numeric variable [10b] `AgeNumeric` , with its value set to the midpoint of each `AgeBand`, so we can treat `Age` as a numeric variable rather than as categorical. 
+##### (Note: for "> 60" , we'll arbitrarily use 65 for the right-censored data.)
+```{r manipulate-data-10b}
+#### Copy the factors from AgeBands to create "AgeNumeric"  (Factors are actually stored internally as 1,2,3,4)
+commadata$AgeNumeric <- commadata$AgeBands
+
+#### Overwrite the levels  (e.g., "18-29") with their midpoint (here, 23.5) 
+levels(commadata$AgeNumeric) <- c(23.5,37,52.5,65)   ##age bands 18-29 ; 30-44 ; 45-60 ; Over 60 
+
+# The above variable is still stored as strings.
+# Replace the above string values with their numeric equivalents:
+commadata$AgeNumeric <- as.numeric(levels(commadata$AgeNumeric))[commadata$AgeNumeric]
+
+
+kable(table(commadata$AgeNumeric,useNA = "ifany"),
+      col.names=c("Age(Numeric): Midpoint of AgeBand","Freq"),
+      caption="Variable `AgeNumeric`") %>%
+    kable_styling(c("striped", "bordered"))
+```
+
+#### Resequencing the (unordered) levels for [11] `IncomeBands` to reflect the ordering of the bands:  
+
+```{r manipulate-data-11}
+
+#### [11] Fix the `Income` variable - resequence the levels
+
+#t(t(head(commadata$Income,10)))
+
+# Save the income bands 
+commadata$IncomeBands <- commadata$Income
+
+# What are the original levels on the income variable?
+#t(t(levels(commadata$Income)))
+
+### use fct_relevel from library forcats to sort the income levels ordinally
+commadata$IncomeBands = fct_relevel(commadata$IncomeBands, levels(commadata$IncomeBands)[c(1,4,5,2,3)])
+
+kable(table(commadata$IncomeBands,useNA = "ifany"),
+      col.names=c("Income Band","Freq"),
+      caption="Variable `IncomeBands`") %>%
+    kable_styling(c("striped", "bordered"))
+
+```
+
+#### Additionally, I created a new numeric variable [11b] `IncomeNumeric` , with its value set to the midpoint of each `IncomeBand`, so we can treat Income as a numeric variable rather than as categorical: 
+##### (Note: for income of $150,000+ , we'll arbitrarily use $160,000 for the right-censored data.)
+```{r manipulate-data-11b}
+#### Let's replace the above income ranges with their midpoints, so we can treat income as a numeric variable rather than as categorical 
+
+#### Copy the factors from IncomeBands to create "IncomeNumeric"  (Factors are actually stored internally as 1,2,3,4,5)
+commadata$IncomeNumeric <- commadata$IncomeBands
+#### Overwrite the levels  (e.g., "$0 - $24,999") with their midpoint (here, 12500) 
+levels(commadata$IncomeNumeric) <- c(12500,37500,75000,125000,160000)
+
+
+# The above variable is still stored as strings.
+# Replace the above string values with their numeric equivalents:
+commadata$IncomeNumeric <- as.numeric(levels(commadata$IncomeNumeric))[commadata$IncomeNumeric]
+
+kable(table(commadata$IncomeNumeric,useNA = "ifany"),
+      col.names=c("Income(Numeric): Midpoint of IncomeBand","Freq"),
+      caption="Variable `IncomeNumeric`") %>%
+    kable_styling(c("striped", "bordered"))
+```
+
+
+
+#### Resequencing the (unordered) levels for [12] `Education` to reflect the ordering of the Educational Attainment:  
+
+```{r manipulate-data-12}
+
+#### [12] Resequence the levels for the ***Education*** variable
+
+# What are the original levels on the Education variable?
+#t(t(levels(commadata$Education)))
+#[1,] "Bachelor degree"                 
+#[2,] "Graduate degree"                 
+#[3,] "High school degree"              
+#[4,] "Less than high school degree"    
+#[5,] "Some college or Associate degree"  
+
+
+### use fct_relevel from library forcats to sort the Education levels ordinally
+commadata$Education = fct_relevel(commadata$Education, levels(commadata$Education)[c(4,3,5,1,2)])
+
+#t(t(levels(commadata$Education)))
+
+#t(t(summary(commadata$Education)))              # resequenced to reflect ordering from "Less than high school degree" to "Graduate degree"
+
+kable(table(commadata$Education,useNA = "ifany"),
+      col.names=c("Level of Educational Attainment of participant","Freq"),
+      caption="Variable `Education`") %>%
+    kable_styling(c("striped", "bordered"))
+```
+
+
+#### Resequencing the levels for [13] `Education` to reflect geography (east coast to west coast):  
+
+```{r manipulate-data-13}
+
+#### [13] Resequence the levels for the ***Location*** variable to reflect geography (east to west)
+
+# What are the original levels on the Location variable?
+#t(t(levels(commadata$Location)))
+# [1,] "East North Central"
+# [2,] "East South Central"
+# [3,] "Middle Atlantic"   
+# [4,] "Mountain"          
+# [5,] "New England"       
+# [6,] "Pacific"           
+# [7,] "South Atlantic"    
+# [8,] "West North Central"
+# [9,] "West South Central"  
+
+
+### use fct_relevel from library forcats to sort the Location levels so they reflect geography from East to West
+commadata$Location = fct_relevel(commadata$Location, levels(commadata$Location)[c(5,3,7,1,2,8,9,4,6)])
+
+#t(t(levels(commadata$Location)))
+
+#t(t(summary(commadata$Location)))              # resequenced to reflect ordering from east coast to west coast
+
+kable(table(commadata$Location,useNA = "ifany"),
+      col.names=c("Geographic location of participant","Freq"),
+      caption="Variable `Location`") %>%
+    kable_styling(c("striped", "bordered"))
+```
+
+
+#### Let's drop the "DATA (singular vs. plural)" questions from the analysis, as those responses represent a different question:
+```{r manipulate-data-20-drop-DATA-questions, echo=FALSE, results='hide', warning=FALSE, message=FALSE}
+
+commadata$DATA_Sentence <- NULL
+commadata$DATA_Plural <- NULL
+commadata$DATA_Care <- NULL
+
+# Dimension after dropping the above variables
+#dim(commadata)
+```
+
+#### Drop cases containing NAs
+```{r manipulate-data-30-drop-NA-cases, echo=FALSE, results='hide', warning=FALSE, message=FALSE}
+#summary(commadata)
+# Size of dataframe BEFORE dropping rows containing NAs:
+#dim(commadata)
+
+## drop rows which contain any NA values
+## (Actually, create a new dataset "comma2" containing only those cases without any "NA" responses.)
+comma2 <- commadata[complete.cases(commadata),]
+# summary(comma2)
+# Size of dataframe "comma2" AFTER dropping rows containing NAs: 
+#dim(comma2)
+```
+
+
+After dropping the incomplete cases (those where at least one response was "NA"), the size of the data set has been reduced to `r dim(comma2)[1]` cases, none of which contains any "NA" values.
+
+
+
+#### ***Variables: What are the two variables you will be studying? State the type of each variable.***
+
+#### ***Dependent Variable***
+#### **What is the response variable? Is it quantitative or qualitative?**
+
+The response variable is `USES_Oxford` - it is a True/False variable which indicates whether a subject prefers the use of the Oxford Comma, or not.
+
+#### ***Independent Variable***
+#### **You should have two independent variables, one quantitative and one qualitative.**
+
+I am going to implement stepwise logistic regression on all of the variables to determine which are most indicative as to whether an individual prefers the use of the Oxford Comma.  (I will omit the variables pertaining to whether "Data" is singular or plural, as those represent a side question.)
+
+Most significantly, I'll explore whether there is any association favoring the Oxford Comma based upon participant `Age`, `Income`, `Gender`, `Education`, and geographic `Location` .  Additionally there are variables indicating whether the user has previously heard about the Oxford Comma `HEARD_Oxford` and how much the respondent cares about it `CARE_Oxford`.  Initially we will include these variables too, but later we will drop them as well.
+
+The raw variables `Age` and `Income` are presented as categorical, as the results are given in bands rather than exact values.  However, I will simulate quantitative (discrete) variables by creating a numerical equivalent where for each case I will set the value to the midpoint of the range.
+
+`Gender` and `Location` are qualitative, non-ordinal variables.
+
+`Education` is a qualitative variable, but it is ordinal as the various levels of education can be ranked.  Likewise, `CARE_Oxford` is ordinal, as the available categories indicate how much the respondent cares, and can be ranked.
+
+My conjecture would be that users of the Oxford Comma would tend to be younger, higher in income, and higher in education than non-users.
+
+I do not have any prior expectation that `Gender` would impact the results.
+
+It would be interesting to see whether `Location` has any impact on the results, as regional dialects can impact  usage of English in various parts of the country.
+
+
+#### ***Type of study: ***
+#### **What is the type of study, observational or an experiment? **
+
+This is an observational study.
+
+#### **Explain how you’ve arrived at your conclusion using information on the sampling and/or experimental design.**
+
+The study was commissioned by FiveThirtyEight.com , which engaged surveymonkey.com to obtain responses from an online poll. 
+
+It is not clear what criteria (if any) may have been used to filter the pool of individuals who became aware of the survey during the three day window when it was online.  To be an experiment there would need to be a random selection of individuals between treatment and control groups, which is clearly not the case here.
+
+#### ***Scope of inference - generalizability:*** 
+#### **Identify the population of interest, and whether the findings from this analysis can be generalized to that population, or, if not, a subsection of that population. **
+
+The population of interest would be all the adults in the USA.
+
+While the respondents to the survey appear (based upon summary statistics) to be well-distributed across factors such as geography, income, age, gender, and level of education, the survey was limited to individuals who self-selected to participate in an online poll organized by FiveThirtyEight.com and executed through SurveyMonkey.com .
+
+#### **Explain why or why not. **
+
+FiveThirtyEight.com is an opinion polling aggregation and analysis website founded in 2008 by Nate Silver, who gained attention for his precise forecasts of US election results.  To participate in the 2014 Oxford Comma poll examined here, users would have to be aware of the FiveThirtyEight website and interested in taking the time to submit their responses during the three-day window that the poll was open on surveymoney.com .
+
+#### **Also discuss any potential sources of bias that might prevent generalizability.**
+
+The set of individuals who have interest in the matters discussed at FiveThirtyEight.com , and those who choose to participate in online surveys,  may differ from the US population.
+
+Therefore it is unclear as to whether the results of the survey could be generalized to the entire US population.  Without further details on the methodology for participant selection, it would be difficult to assert that the participants were independent and identically distributed across the variables of interest.  
+
+Thus, we cannot be sure that the sample made available for the survey is free from bias.
+
+#### ***Scope of inference - causality: Can these data be used to establish causal links between the variables of interest?*** 
+
+Because this is an observational study, it cannot be used to establish causality.
+
+#### **Explain why or why not.**
+
+This is simply a survey which shows associations between various preferences.  It is not meant to assert that one variable "causes" another.
+
+
+
+
+
+
+
+
+
+
+
+
+### ***Part 3 - Exploratory data analysis***
+
+####Exploratory data analysis: Perform relevant descriptive statistics, including summary statistics and visualization of the data. Also address what the exploratory data analysis suggests about your research question.
+
+
+#### [2] Does the respondent ***prefer to use*** the oxford comma?
+```{r describe-USES_Oxford, eval=T}
+kable(table(comma2$USES_Oxford,useNA = "ifany"),
+      col.names=c("Among complete cases, did the respondent prefer the sentence containing the Oxford Comma?","Freq"),
+      caption="Variable `USES_Oxford`") %>%
+    kable_styling(c("striped", "bordered"))
+```
+
+```{r do-you-use, eval=T, fig.height=5,fig.width=8}
+plot.new()
+bx02 <- barplot(table(comma2$USES_Oxford),col=c("red","green"),
+        xlab = "Do you prefer to use the Oxford Comma?", 
+        ylab = "Frequency", 
+        ylim=c(0,max(table(comma2$USES_Oxford))*1.1), 
+
+        main =   "Oxford Comma ***USAGE*** among respondents to FiveThirtyEight.com poll")
+text(x = bx02, 
+     y=table(comma2$USES_Oxford)+10,  
+     label = as.character(table(comma2$USES_Oxford), pos=3, cex=1.0,  col="black"))
+```
+
+
+#### [3] Has the respondent ***previously heard about*** the Oxford Comma?
+```{r heard-about, eval=T}
+kable(table(comma2$HEARD_Oxford,useNA = "ifany"),
+      col.names=c("Had you previously heard about the Oxford Comma?","Freq"),
+      caption="Variable `HEARD_Oxford`") %>%
+    kable_styling(c("striped", "bordered"))
+```
+
+
+```{r heard-about-plot, eval=T, fig.height=5,fig.width=10}
+bx03 <- barplot(table(comma2$HEARD_Oxford),col=c("red","green"),
+        xlab = "Have you previously heard about the Oxford Comma?", 
+        ylab = "Frequency", 
+        ylim=c(0,max(table(comma2$HEARD_Oxford))*1.1), 
+        main =   "Oxford Comma ***AWARENESS*** among respondents to FiveThirtyEight.com poll")
+text(x = bx03, 
+     y=table(comma2$HEARD_Oxford)+14, 
+     label = as.character(table(comma2$HEARD_Oxford), pos=3, cex=1.0,  col="black"))
+```
+
+#### [4] Does the respondent ***care about*** the Oxford Comma?
+```{r care-about, eval=T}
+kable(table(comma2$CARE_Oxford,useNA = "ifany"),
+      col.names=c("How much (if at all) do you care about the Oxford Comma?","Freq"),
+      caption="Variable `CARE_Oxford`") %>%
+    kable_styling(c("striped", "bordered")) # already resequenced above to reflect ordering from "A lot" to "Not at all"
+```
+
+```{r care-about-barplot, eval=T, fig.height=7,fig.width=10}
+### Barplot of degree to which respondent cares about the Oxford Comma
+bx04 <-barplot(table(comma2$CARE_Oxford),col=rainbow(4),
+        xlab = "How much do you care?", 
+        ylab = "Frequency", 
+        ylim=c(0,max(table(comma2$CARE_Oxford))*1.1), 
+        main =   "How much do respondents CARE about the 'Oxford Comma' ?")
+text(x = bx04, 
+     y=table(comma2$CARE_Oxford)+10, 
+     label = as.character(table(comma2$CARE_Oxford), pos=3, cex=1.0,  col="black"))
+```
+
+The results somewhat resemble a normal distribution, e.g., if we were to assign ascending numerical values to the categories.
+
+#### Have you Heard vs. Do you Care?
+```{r heard-about-care-about, eval=T, fig.height=7,fig.width=10}
+# Have you previously heard about the Oxford Comma vs. how much do you care about it?
+kable(table(comma2$CARE_Oxford,comma2$HEARD_Oxford)) %>%
+  kable_styling(c("striped", "bordered")) %>%
+  add_header_above(c("How much (if at all) do you CARE about the Oxford Comma?", "Have you previously HEARD about the Oxford Comma?" = 2 ))
+mosaicplot(comma2$HEARD_Oxford ~ comma2$CARE_Oxford,col=rainbow(4),las=1,
+           xlab="Have you (previously) heard of the Oxford Comma?",
+           ylab="Do you care?",
+           main = "'Have you HEARD' vs. 'Do you CARE?'")
+``` 
+
+Respondents who have previously heard of the Oxford Comma are more likely to care about it, while those who have not previously heard about it are less likely.
+
+#### [8] Does the respondent believe that ***correct grammar*** is important?
+```{r grammar-important,eval=T}
+kable(table(comma2$Grammar_Important,useNA = "ifany"),
+      col.names=c("Do you believe that correct grammar is important?","Freq"),
+      caption="Variable `Grammar_Important`") %>%
+    kable_styling(c("striped", "bordered"))      # already resequenced above to reflect ordering
+```
+
+```{r correct-grammar-barplot, eval=T, fig.height=7,fig.width=10}
+### Barplot of importance of correct grammar
+barplot_names = levels(comma2$Grammar_Important)
+barplot_names[3]="Neutral"                          # otherwise this entry is too long
+bx08 <- barplot(table(comma2$Grammar_Important),col=rainbow(5),names.arg = barplot_names,
+        xlab = "Opinion", 
+        ylab = "Frequency", 
+        ylim=c(0,max(table(comma2$Grammar_Important))*1.1), 
+        main =  "Do you believe that correct grammar is important?")
+text(x = bx08, 
+     y=table(comma2$Grammar_Important)+10, 
+     label = as.character(table(comma2$Grammar_Important), pos=3, cex=1.0,  col="black"))
+```
+
+
+#### [9] What is the respondent's ***gender*** ?
+```{r gender,eval=T}
+kable(table(comma2$Gender,useNA = "ifany"),
+      col.names=c("What is your gender?","Freq"),
+      caption="Variable `Gender`") %>%
+    kable_styling(c("striped", "bordered")) 
+```
+
+
+#### Usage of Oxford Comma by gender: Is there any obvious difference?
+```{r gender-mosaicplot, eval=T, fig.height=7,fig.width=10}
+# Number of each gender using Oxford Comma
+tbl09ax <- table(comma2$USES_Oxford, comma2$Gender)
+tbl09a <- prop.table(table(comma2$USES_Oxford, comma2$Gender))
+bx09a <- barplot(tbl09a,col=c("red","green"),beside=T,
+                  xlab = "Do you prefer to use the Oxford Comma? (Red=no, Green=yes)", 
+                  ylab = "Percentage", 
+                  ylim=c(0,max(tbl09a)*1.1), 
+                  main = "Count, Percentage of Oxford Comma users/nonusers (overall)"
+)
+text(x = bx09a, 
+     y=tbl09a+0.010, 
+     label = as.character(tbl09ax), pos=3, cex=1.0,  col="black")
+
+
+# Percentage within each row using the Oxford Comma
+tbl09b = prop.table(table(comma2$USES_Oxford, comma2$Gender),1)
+bx09b <- barplot(t(tbl09b),col=c("pink","lightblue"),beside=T,
+                 legend=colnames(tbl09b),
+                  xlab = "What fraction of users/nonusers are members of each gender?", 
+                  ylab = "Fraction", 
+                  ylim=c(0,max(tbl09b)*1.1), 
+                  main = "Fraction of Oxford Comma users/nonusers who are female(pink) / male(blue)"
+
+                 )
+text(x = bx09b, 
+     y=t(tbl09b)+0.010, 
+     label = as.character(t(round(tbl09b,3))), pos=3, cex=1.0,  col="black")
+
+# Percentage within each column using the Oxford Comma
+tbl09c = prop.table(table(comma2$USES_Oxford, comma2$Gender),2)
+bx09c <- barplot(tbl09c,col=c("red","green"),beside=T,
+                  legend.text=rownames(tbl09c),
+                  args.legend = list(x = "topleft"),
+                  xlab = "What fraction of each gender prefer the Oxford Comma?", 
+                  ylab = "Fraction", 
+                  ylim=c(0,max(tbl09c)*1.1), 
+                  main = "Fraction of Males/Females who are Oxford Comma users/nonusers"
+                 
+                 )
+text(x = bx09c, 
+     y=tbl09c+0.010, 
+     label = as.character(round(tbl09c,3)), pos=3, cex=1.0,  col="black")
+
+
+
+mosaicplot(comma2$Gender~ comma2$USES_Oxford, col=c("Red","Green"), 
+           xlab="Gender", ylab="Uses Oxford Comma?",
+           main = "Use of Oxford Comma by Gender")
+```
+
+The percentage of each gender using the Oxford Comma is about the same.
+
+
+#### [10] What is the respondent's ***age band***  ?
+```{r age,eval=T}
+kable(table(comma2$AgeBands,useNA = "ifany"),
+      col.names=c("Age Band","Freq (complete cases only)"),
+      caption="Variable `AgeBands`") %>%
+    kable_styling(c("striped", "bordered"))      # already resequenced to reflect ordering of age bands
+```
+
+```{r age-barplot, eval=T, fig.height=7,fig.width=10}
+### Barplot of age bands
+tbl10 <- table(comma2$AgeBands)
+bx10 <-  barplot(tbl10,col=rainbow(4),space = 1,
+                 xlab = "Age Bands", ylab = "Frequency", 
+                 ylim=c(0,max(tbl10)*1.1),
+                 main =   "Age range of respondents to 'Oxford Comma' survey")
+
+text(x = bx10, 
+     y=tbl10+4, 
+     label = as.character(round(tbl10,3)), pos=3, cex=1.0,  col="black")
+```
+
+The above results appear to resemble a normal distribution.  (Unfortunately, as the data source does not provide raw data on this quantitative variable but rather only gives results as aggregated into four age buckets, it is not possible to perform scatterplots, etc., directly on ***this*** variable.)
+
+
+#### [11] What is the respondent's ***income band*** ?
+```{r IncomeBands,eval=T}
+kable(table(comma2$IncomeBands,useNA = "ifany"),
+      col.names=c("Income Band","Freq (complete cases only)"),
+      caption="Variable `IncomeBands`") %>%
+    kable_styling(c("striped", "bordered"))  # resequenced to reflect ordering of income bands
+```
+
+```{r income-barplot, eval=T, fig.height=7,fig.width=10}
+### Barplot of income bands
+
+
+tbl11 <- table(comma2$IncomeBands)
+bx11 <-  barplot(tbl11,col=rainbow(5),space = 1,
+                 xlab = "Income Ranges", ylab = "Frequency", 
+                 ylim=c(0,max(tbl11)*1.1),
+                 main =   "Income range of respondents to 'Oxford Comma' survey")
+
+text(x = bx11, 
+     y=tbl11+4, 
+     label = as.character(round(tbl11,3)), pos=3, cex=1.0,  col="black")
+
+```
+
+The above results appear to resemble a normal distribution.  (Unfortunately, as the data source does not provide raw data on this quantitative variable but rather only gives results as aggregated into five income buckets, it is not possible to perform scatterplots, etc., directly on ***this*** variable.)
+
+
+#### Distribution by Age vs. Income
+```{r age-vs-income_ALL, eval=T,fig.height=7,fig.width=10}
+
+# Table of all respondents (excepting cases containing NAs) by Age and Income
+
+tblAgeIncomeAll <- table(comma2$AgeBands,comma2$IncomeBands)
+kable(tblAgeIncomeAll) %>%
+  kable_styling(c("striped", "bordered")) %>%
+  add_header_above(c(" ", "Number of respondents, by Age and Income" = 5 ))
+
+plot(comma2$IncomeBands,comma2$AgeBands,
+     col=rainbow(4),
+     xlab="Income", ylab="Age",
+     main="Distribution of all respondents by Age and Income")
+```
+
+
+While we cannot illustrate linear regression on the Age vs. Income, because each of these variables has been stored as a categorical range, we can approximate the result by replacing each such range with a number.  By assigning the ***midpoint*** of each Income and Age band to new Numeric variables, we can perform a regression based upon these results (although, the value of doing so may be questionable.)  Note that for the open-ended upper bands on each variable, we'll arbitrarily assume age=65 for AgeBand ">60" and income = \$160,000 for IncomeBand "> \$150,000" .
+
+Additionally, we can "jitter" the points to distribute their display around the such midpoint, we can get a slightly better picture as to how many points fall into each group.
+
+```{r try-jitter-age-Income-ALL, eval=T}
+linearmodelAll <- lm(comma2$AgeNumeric ~ comma2$IncomeNumeric)
+summary(linearmodelAll)
+plot(x=jitter(comma2$IncomeNumeric),y = jitter(comma2$AgeNumeric),col="blue",
+     main="Plot of income vs. age for all respondents,\n where band midpoints have been imputed (and jittered).")
+abline(linearmodelAll,col="red")
+AgeIncomeR2All <- summary(linearmodelAll)$r.squared
+AgeIncomeCorrAll <- cor(comma2$AgeNumeric  ,  comma2$IncomeNumeric)
+
+```
+
+These results show a correlation between overall age and income of `r AgeIncomeCorrAll` which corresponds to an R-squared of `r AgeIncomeR2All` . 
+
+#### Oxford Comma Users
+```{r age-vs-income_TRUE, eval=T,fig.height=7,fig.width=10}
+
+comma2True <- comma2[comma2$USES_Oxford==T,]
+# Table of Oxford Comma USERS by Age and Income
+tblAgeIncomeTrue <- table(comma2True$AgeBands,comma2True$IncomeBands)
+kable(tblAgeIncomeTrue) %>%
+  kable_styling(c("striped", "bordered")) %>%
+  add_header_above(c(" ", "Number of respondents who ARE Oxford Comma users" = 5 ))
+
+
+plot(comma2True$IncomeBands,comma2True$AgeBands,
+     col=rainbow(4),
+     main="Distribution of all Oxford comma USERS by Age and Income")
+
+# Percentage in each group who ARE Oxford comma users
+pctTrue <- (tblAgeIncomeTrue/tblAgeIncomeAll)
+kable(pctTrue)%>%
+  kable_styling(c("striped", "bordered")) %>%
+  add_header_above(c(" ", "Fraction in each group who ARE Oxford Comma users" = 5 ))
+```
+
+For just those individuals who ***DO*** prefer the Oxford Comma, we perform the same linear regression as above on the Age and Income values, where we have assumed each value to be at the midpoint of the respective range, but displayed on the graph using jitter:
+
+```{r try-jitter-age-Income-True, eval=T}
+linearmodelTrue <- lm(comma2True$AgeNumeric ~ comma2True$IncomeNumeric)
+summary(linearmodelTrue)
+plot(x = jitter(comma2True$IncomeNumeric),
+     y = jitter(comma2True$AgeNumeric),
+     col="Violet",
+     main="Plot of income vs. age for OXFORD COMMA USERS,\n where band midpoints have been imputed (and jittered).")
+abline(linearmodelTrue,col="red")
+AgeIncomeR2True <- summary(linearmodelTrue)$r.squared
+AgeIncomeCorrTrue <- cor(comma2True$AgeNumeric,
+                         comma2True$IncomeNumeric)
+```
+
+Among individuals who indicate that they prefer to ***use*** the Oxford Comma, these results show a correlation between overall age and income of `r AgeIncomeCorrTrue` which corresponds to an R-squared of `r AgeIncomeR2True` . 
+
+#### Oxford Comma non-users
+```{r age-vs-income_FALSE, eval=T,fig.height=7,fig.width=10}
+
+
+comma2False <- comma2[comma2$USES_Oxford==F,]
+
+# Table of Oxford Comma NON-users by Age and Income
+tblAgeIncomeFalse <- table(comma2False$AgeBands,comma2False$IncomeBands)
+kable(tblAgeIncomeFalse)%>%
+  kable_styling(c("striped", "bordered")) %>%
+  add_header_above(c(" ", "Number of respondents who are NOT Oxford Comma users" = 5 ))
+
+
+plot(comma2False$IncomeBands,comma2False$AgeBands,
+     col=rainbow(4),
+     main="Distribution of all Oxford comma NON-USERS by Age and Income")
+
+# Percentage in each group who are NOT Oxford comma users
+
+pctFalse <- (tblAgeIncomeFalse/tblAgeIncomeAll)
+kable(pctFalse)%>%
+  kable_styling(c("striped", "bordered")) %>%
+  add_header_above(c(" ", "Fraction in each group who are NOT Oxford Comma Users" = 5 ))
+
+
+```
+
+
+
+For just those individuals who ***DO NOT*** prefer the Oxford Comma, we perform the same linear regression as above on the Age and Income values, where we have assumed each value to be at the midpoint of the respective range, but displayed on the graph using jitter:
+
+```{r try-jitter-age-Income-False, eval=T}
+linearmodelFalse <- lm(comma2False$AgeNumeric ~ comma2False$IncomeNumeric)
+summary(linearmodelFalse)
+plot(x = jitter(comma2False$IncomeNumeric),
+     y = jitter(comma2False$AgeNumeric),
+     col="brown",
+     main="Plot of income vs. age for Oxford comma NON-users,\n where band midpoints have been imputed (and jittered).")
+abline(linearmodelFalse,col="red")
+AgeIncomeR2False <- summary(linearmodelFalse)$r.squared
+AgeIncomeCorrFalse <- cor(comma2False$AgeNumeric,
+                         comma2False$IncomeNumeric)
+```
+
+Among individuals who indicate that they prefer to **NOT** use the Oxford Comma, these results show a correlation between overall age and income of `r AgeIncomeCorrFalse` , which corresponds to an R-squared of `r AgeIncomeR2False` . 
+
+
+From the above barplots, it is noteworthy that there is a significant difference among the group consisting of the youngest (age 18-29) and lowest income (<$25,000) individuals, in that nearly all of such (50 of 56) ARE Oxford Comma Users.
+
+Among those who do use the Oxford Comma, the median age falls in the 30-44 band, while among those who do NOT use the Oxford Comma, the median age falls in the 45-60 age band.
+
+ 
+
+#### [12] What is the respondent's level of ***education***?
+```{r education, eval=T}
+
+kable(table(comma2$Education,useNA = "ifany"),
+      col.names=c("Education","Freq (complete cases only)"),
+      caption="Variable `Education`") %>%
+    kable_styling(c("striped", "bordered"))              # already resequenced to reflect ordering of educational attainment
+```
+
+```{r education-barplot, eval=T, fig.height=7,fig.width=14}
+### Barplot of educational attainment
+tbl12 <- table(comma2True$Education)
+bx12 <-  barplot(tbl12,col=rainbow(5),space = 1,
+                 xlab = "Educational Attainment", ylab = "Frequency", 
+                 ylim=c(0,max(tbl12)*1.1),
+                 main =   "Educational Attainment of respondents to 'Oxford Comma' survey")
+
+text(x = bx12, 
+     y=tbl12+4, 
+     label = as.character(round(tbl12,3)), pos=3, cex=1.0,  col="black")
+```
+
+The data is left-skewed, with the median respondent having a bachelor's degree.
+
+
+#### [13] Geography
+```{r geography, eval=T}
+# Where is the respondent located?
+kable(table(comma2$Location,useNA = "ifany"),
+      col.names=c("Location","Freq (complete cases only)"),
+      caption="Variable `Location`") %>%
+    kable_styling(c("striped", "bordered"))      # already resequenced to reflect geography (east to west)
+EastCoast = summary(comma2$Location)[c(1,2,3)]
+MiddleUSA = summary(comma2$Location)[c(4,5,6,7)]
+WesternUSA = summary(comma2$Location)[c(8,9)]
+```
+
+The respondents are geographically well-distributed across the USA, with `r sum(EastCoast)` from the **East Coast**, `r sum(MiddleUSA)` from the **Central** portion of the country, and `r sum(WesternUSA)` from the **West**.
+
+```{r geography-mosaic, eval=T, fig.height=7,fig.width=10}
+# Table of Oxford Comma Usage by region
+kable(table(comma2$Location,comma2$USES_Oxford),
+      #col.names=c("Location","Freq (complete cases only)"),
+      caption="Variable `Location`") %>%
+    kable_styling(c("striped", "bordered")) %>%
+  add_header_above(c(" ", "Oxford Comma User?" = 2 ))
+
+# Mosaic Plot
+mosaicplot(data=comma2, USES_Oxford ~ Location, col=rainbow(9), las=1, main =  "Oxford Comma Usage by region")
+
+```
+
+
+
+
+
+### ***Part 4 - Inference***
+
+#### If your data fails some conditions and you can’t use a theoretical method, then you should use simulation. If you can use both methods, then you should use both methods. It is your responsibility to figure out the appropriate methodology.
+
+#### Check conditions
+
+The test that will be used is the ***Chi-Squared test.***
+
+There are two conditions[$^3$](#c) that must be checked before performing a chi-square test:
+
+***Independence.*** Each case that contributes a count to the table must be independent of all the other cases in the table.
+
+***Sample size / distribution.*** Each particular scenario (i.e. cell count) must have at least 5 expected cases.
+
+These conditions are met for each of the tests that we will try.  
+
+Each case is independent, as it represents an individual who responded to the Oxford Comma survey in 2014.
+
+Additionally, the contingency tables will demonstrate at least 5 cases in the respective cells.
+
+#### Theoretical inference (if possible) - hypothesis test and confidence interval
+
+The hypothesis tests below will be chi-squared tests, of the form:
+
+$H_0$ : Response and explanatory variable are independent.
+
+$H_a$ : Response and explanatory variable are dependent.
+
+In each case, the response variable will be `USES_Oxford` .
+
+We will look at several explanatory variables which are selected by stepwise regression, which indicates that they show the best association with the response variable.
+
+
+#### Simulation based inference - hypothesis test and confidence interval
+
+We can obtain a confidence interval on a metric known as ***"Cramer's V"*** which serves as a measure of association between categorical variables where a variable has more than 2 cases.
+
+#### Brief description of methodology that reflects your conceptual understanding
+
+
+
+```{r set-options, echo=FALSE, cache=FALSE}
+options(width = 140)
+```
+
+
+First, we seek to determine which variable(s) provide the strongest association to determine whether or not an individual prefers to use the Oxford Comma.  We start by performing "Forward" and "Backward" stepwise regressions.  
+
+The "Forward"" Stepwise regression starts with an "empty"" model and adds one variable at a time (whichever provides the best improvement to the model) until none of the remaining variables would improve the model according to a metric which rewards parsimony (having few parameters) by introducing a penalty for each added variable.
+
+The "Backward" stepwise regression does the reverse -- it starts from a full model (incorporating all variables) and then drops one variable at a time, selecting which to drop by determining which provides the best improvement to the same metric as that used above.  The algorithm halts when dropping any of the remaining variables would fail to improve the model.
+
+In many cases, the "Forward" and "Backward" stepwise regressions will converge on the same set of variables, however there are edge cases where, because of interactions between variables, the optimal solution can't be reached by one of the the methods.
+
+There are several metrics which can be used to rank comparative model quality; the one used here is known as the "Akaike Information Criterion" (AIC), which is based upon Maximum Likelihood Estimation, with a penalty term to discourage having too many variables in the model.
+
+${AIC = 2k - 2log(\Lambda)}$ ,  where $k$ is the number of parameters in the model and $\Lambda$ is the maximum likelihood for such model.  
+
+The goal of the model selection algorithm is to minimize the AIC. 
+
+
+####  Eliminating collinearities:
+
+##### First, filter the dataset to drop the collinearities (e.g., we can't have both `AgeBands` and `AgeNumeric` in the dataset when performing the regressions.  Likewise for `IncomeBands` and `IncomeNumeric` .)
+```{r test-regressions, eval=T}
+kable(t(rbind(seq(names(comma2)),names(comma2))),caption="Variable names",col.names = c("n","All Variables")) %>%
+  kable_styling(c("striped", "bordered"))
+
+# All-categorical dataset "comma3bands" :
+comma3bands = comma2[c(-6,-7,-11,-13)]
+kable(t(rbind(seq(names(comma3bands)),names(comma3bands))),caption="Variable names: AgeBands, IncomeBands",col.names = c("n","All Categorical Variables")) %>%
+  kable_styling(c("striped", "bordered"))
+
+## Not doing this
+## Dataset with Age and Income treated as Numeric, based at the midpoint of the respective bands:
+#comma3numeric = comma2[c(-6,-7,-10,-12)]
+#kable(t(rbind(seq(names(comma3numeric)),names(comma3numeric))),caption="Variable names: #AgeNumeric, IncomeNumeric",col.names = c("n","All Variables, with Numeric Age & Income")) %>%
+#  kable_styling(c("striped", "bordered"))
+```
+
+##### List of variables considered (after eliminating collinearities) using all-categorical dataset (comma3bands):
+```{r list-of-variables, eval=T}
+kable(names(comma3bands),col.names = c("List of variables considered")) %>%
+  kable_styling(c("striped", "bordered"))
+```
+
+The "Backward" stepwise regression starts from a full model and then eliminates one variable at a time (whichever contributes least to the regression result.)  A measure known as the "Akaike Information Criterion" computes a relative ranking on each candidate model.  It is based upon maximum likelihood estimation, with a penalty for too many parameters.
+
+ At each step, the AIC is computed for the current model, and for each possible model where a single one of the current parameters is dropped.  If there is a variable which, when dropped, will cause the largest reduction in the AIC, then that variable is dropped.  The algorithm halts when eliminating any of the remaining variables would cause the AIC to rise.
+
+#### Baseline regressions: Full and Empty models
+
+##### Full model: starting point for Backward stepwise
+```{r full-model, eval=T}
+fullmodel <- glm(USES_Oxford ~ ., data = comma3bands, family=binomial)
+summary(fullmodel)
+```
+
+The "Full Model" shows the result of a logistic regression where all variables are included.  It shows a strong association on the variable `CARE_Oxford` (i.e., does the participant "care about" the Oxford Comma) and on `AgeBands`, while showing a still significant, but weaker, association with `IncomeBands`.
+
+##### Empty model: starting point for Forward stepwise
+```{r empty-model, eval=T}
+emptymodel <- glm(USES_Oxford ~ 1, data = comma3bands, family=binomial )
+summary(emptymodel)
+```
+
+The "Empty Model" illustrates the worst-case of having no independent variables -- it only generates an intercept.
+
+#### ***Stepwise Regressions***
+
+#### Backwards
+
+The backwards stepwise regression starts from the full model and then eliminates variables, one by one.  
+
+At each step, the remaining variable which provides the weakest contribution to the model is eliminated.
+
+Such variable is determined by computing the AIC for the model containing all the variables currently included in the model, and then recomputing each possible AIC that would result if one of the remaining variables were dropped; the variable which, when eliminated, causes the largest possible drop in the AIC, is removed, and the algorithm continues on the remaining variables until the AIC will not get any smaller.
+
+```{r backwards-stepwise, eval=T}
+backwards <- step(fullmodel,trace = 1)
+summary(backwards)
+```
+
+##### The first variable to be dropped was `Grammar_Important`.
+##### The second variable to be dropped was `Gender`.
+##### The third variable to be dropped was `HEARD_Oxford`.
+
+The remaining independent variables all contribute to the model such that the Akaike Information Criterion (AIC) is minimized (i.e., removing any of them would cause the AIC to increase above its final level, 1006) :
+
+##### `USES_Oxford` ~ `CARE_Oxford` + `Education` + `Location` + `AgeBands` + `IncomeBands`
+
+#### Forward
+
+The forward stepwise regression starts from the empty model (no independent variables) and then adds variables, one-by-one, where the variables considered are the same as those available in the full model.  At each step, the variable which provides the strongest contribution to the model is added.
+
+```{r forward-stepwise}
+forwards <- step(emptymodel,scope=list(lower=formula(emptymodel),upper=formula(fullmodel)), direction="forward",trace=1)
+summary(forwards)
+
+```
+
+
+##### The variables added to the empty model, in sequence, are the following:
+##### `CARE_Oxford` + `AgeBands` + `Location` + `Education` + `IncomeBands`
+
+In this case, this result matches that from the backwards stepwise regression  (but note that this need not always happen.)
+
+
+So far, the results indicate that the variable with the strongest association with `USES_Oxford` is `CARE_Oxford` : i.e., a person who cares about the Oxford Comma is most likely to use it.
+
+We can confirm this with a Chi-Squared test:
+
+#### Chi-Squared Test on `USES_Oxford` vs. `CARE_Oxford` 
+```{r chi-squared-uses-care, eval=T,fig.width=10}
+
+Xsq1 <- chisq.test(xtabs( ~ USES_Oxford+CARE_Oxford, data=comma3bands))
+Xsq1
+```
+
+The result of the Chi-Squared test indicates a significant association between `USES_Oxford` and `CARE_Oxford`.
+
+#### Chi-Squared Residuals
+```{r chi-squared-residuals, eval=T, fig.width=12}
+Xsq1$residuals %>% kable() %>%
+  kable_styling(c("striped", "bordered")) %>%
+  add_header_above(c("Do you use the Oxford Comma?", "RESIDUALS:      How much do you care about the Oxford Comma?" = 4 ))
+
+# Plot the residuals
+assocplot(xtabs( ~ CARE_Oxford+USES_Oxford, data=comma3bands),col=c("green","red"),main = "RESIDUALS: Do you CARE about the Oxford Comma? vs. Do you USE the Oxford Comma?")
+```
+
+#### Inference function (from OpenIntro - Labs 5 and 6)
+#### Theoretical:
+```{r inference-function-Theoretical, eval=T}
+#require(DATA606)
+inference(y = comma3bands$USES_Oxford, x = comma3bands$CARE_Oxford, est = "proportion", type = "ht",alternative = "greater", method = "theoretical",eda_plot = T,inf_plot =  T)
+```
+
+#### Simulation:
+```{r inference-function-Simulation, eval=T}
+#require(DATA606)
+inference(y = comma3bands$USES_Oxford, x = comma3bands$CARE_Oxford, est = "proportion", type = "ht",alternative = "greater", method = "simulation",eda_plot = T,inf_plot =  T)
+```
+
+#### Cramer's V
+
+While the chi-squared test indicates the ***significance*** of an association between categorical variables, it does not tell us about the ***strength*** of such association.  
+
+For numerical variables, we are familiar with computing the correlation, $R$, and the goodness-of-fit, $R^2$, to indicate such strength.  
+
+We cannot do this directly on categorical variables when a variable has more than 2 categories.
+
+But, there is a measure known as "Cramer's V" which adjusts the Chi-Squared statistic to a value between 0 and 1, thus giving us a measure which indicates the strength of the association.
+
+***Cramer's V*** is computed by taking the square root of the chi-squared statistic divided by the sample size and the minimum dimension minus 1:
+
+$$ V = \sqrt{ \frac{{\chi^2}/{n}} {min(k-1,r-1)}} $$
+where ${\chi^2}$ is the result of the Chi-Squared calculation; $n$ is the grand total of observations; $k$ is the number of columns, and $r$ is the number of rows.
+
+
+#### Assocstats from vcd: includes Cramer's V
+```{r assocstats, eval=T}
+#require(vcd)
+assocstats(xtabs( ~  CARE_Oxford +USES_Oxford, data=comma3bands))
+
+# Cramer's V
+#require(questionr)
+cramer.v(xtabs( ~  CARE_Oxford +USES_Oxford, data=comma3bands))
+```
+
+The result, 0.3216, indicates the strength of the association between the 2 variables.
+
+#### Compute confidence  intervals on  Cramer's V
+```{r cramerV-CI}
+#require(rcompanion)
+cramerV(xtabs( ~  CARE_Oxford +USES_Oxford, data=comma3bands),ci=TRUE,conf=0.95,histogram=T,R=1000)
+```
+
+The above result displays the confidence interval on Cramer's V, based upon 1000 bootstrap samples.  (The values will fluctuate slightly across runs.)
+
+
+
+
+##### However, these results are not very informative, because it is to be expected that a person who cares about the Oxford Comma would be a user of the Oxford comma.  
+
+##### Therefore it would be interesting to drop the other Oxford variables `CARE_Oxford`, `HEARD_Oxford` from the model and re-fit the regression without it:
+
+```{r full-model-no-CARE, eval=T}
+comma4bands <- comma3bands
+comma4bands$CARE_Oxford <- NULL
+comma4bands$HEARD_Oxford <- NULL
+kable(names(comma4bands),col.names = c("Reduced List of variables considered")) %>%
+  kable_styling(c("striped", "bordered"))
+
+```
+
+
+##### Full model: starting point for Backward stepwise on smaller dataset
+```{r full-model-4, eval=T}
+fullmodel4 <- glm(USES_Oxford ~ ., data = comma4bands, family=binomial)
+summary(fullmodel4)
+```
+
+##### Backwards stepwise regression on smaller dataset
+```{r backwards-stepwise-4, eval=T}
+backwards4 <- step(fullmodel4,trace = 1)
+summary(backwards4)
+```
+
+##### Forward stepwise regression, starting from emptymode, on smaller dataset
+```{r forward-stepwise-4}
+forwards4 <- step(emptymodel,scope=list(lower=formula(emptymodel),upper=formula(fullmodel4)), direction="forward",trace=1)
+summary(forwards4)
+```
+
+
+These results yield the following model: 
+
+##### USES_Oxford ~ Grammar_Important + Education + Location + AgeBands
+
+where the only variable exhibiting strong association is `AgeBands` .
+
+
+#### Chi-Squared Test on `USES_Oxford` vs. `AgeBands`
+```{r chi-squared-uses-Age-4, eval=T,fig.width=10}
+Xsq4 <- chisq.test(xtabs( ~ USES_Oxford+AgeBands, data=comma4bands))
+Xsq4
+```
+
+The result of the Chi-Squared test indicates a significant association between `USES_Oxford` and `AgeBands`.
+
+
+
+
+#### Chi-Squared Residuals
+```{r chi-squared-residuals-4, eval=T}
+Xsq4$residuals %>% kable() %>%
+  kable_styling(c("striped", "bordered")) %>%
+  add_header_above(c("Do you use the Oxford Comma?", "RESIDUALS:      AgeBands" = 4 ))
+
+# Plot the residuals
+assocplot(xtabs( ~ AgeBands + USES_Oxford, data=comma4bands),col=c("green","red"),main = "RESIDUALS: AgeBands vs. Do you USE the Oxford Comma?")
+```
+
+#### Inference function: `USES_Oxford` vs. `AgeBands`
+
+#### Theoretical:
+```{r inference-function-Theoretical-AgeBands, eval=T, fig.width=12,fig.height=10}
+#require(DATA606)
+inference(y = comma4bands$USES_Oxford, x = comma4bands$AgeBands, est = "proportion", type = "ht",alternative = "greater", method = "theoretical",eda_plot = T,inf_plot =  T)
+```
+
+The result shows a strongly declining association with age on the usage of the Oxford Comma.
+
+
+#### Simulation:
+```{r inference-function-Simulation-4, eval=T}
+#require(DATA606)
+inference(y = comma4bands$USES_Oxford, x = comma4bands$AgeBands, est = "proportion", type = "ht",alternative = "greater", method = "simulation",eda_plot = T,inf_plot =  T)
+```
+
+
+The simulation gives results which are consistent with the theoretical.
+
+
+
+
+#### Cramer's V for `AgeBands` 
+```{r assocstats-4, eval=T}
+#require(vcd)
+assocstats(xtabs( ~  AgeBands +USES_Oxford, data=comma4bands))
+
+# Cramer's V
+#require(questionr)
+cramer.v(xtabs( ~  AgeBands +USES_Oxford, data=comma4bands))
+```
+
+The result here, 0.245358, is not as strong as that computed above with respect to `CARE_Oxford`.
+
+#### Compute confidence  intervals on  Cramer's V for `AgeBands`
+```{r cramerV-CI-4}
+#require(rcompanion)
+cramerV(xtabs( ~  AgeBands +USES_Oxford, data=comma4bands),ci=TRUE,conf=0.95,histogram=T,R=1000)
+```
+
+The above result displays the confidence interval on the Cramer's V for `AgeBands` vs. `USES_Oxford`, based upon 1000 bootstrap samples.  (The values will fluctuate slightly across runs.)
+
+#### `IncomeBands` : A variable which is not as closely associated with Oxford Comma usage
+
+Contrary to my prior conjecture, preference for usage of the Oxford comma is not so closely tied to Income.
+
+#### Chi-Squared Test on `USES_Oxford` vs. `IncomeBands`
+```{r chi-squared-uses-Income-5, eval=T,fig.width=10}
+Xsq5 <- chisq.test(xtabs( ~ USES_Oxford+IncomeBands, data=comma4bands))
+Xsq5
+```
+
+The result of the Chi-Squared test indicates an association between `USES_Oxford` and `IncomeBands` which is significant at 95% confidence, but not at 99%.
+
+
+
+
+#### Chi-Squared Residuals
+```{r chi-squared-residuals-5, eval=T, fig.width=12, fig.height=10}
+Xsq5$residuals %>% kable() %>%
+  kable_styling(c("striped", "bordered")) %>%
+  add_header_above(c("Do you use the Oxford Comma?", "RESIDUALS:      IncomeBands" = 5 ))
+
+# Plot the residuals
+assocplot(xtabs( ~ IncomeBands + USES_Oxford, data=comma4bands),col=c("green","red"),main = "RESIDUALS: IncomeBands vs. Do you USE the Oxford Comma?")
+```
+
+The results for `IncomeBands` do not show the clear ordinal relationship which `AgeBands` showed.
+
+
+#### Inference function: `USES_Oxford` vs. `IncomeBands`
+
+#### Theoretical:
+```{r inference-function-Theoretical-IncomeBands, eval=T, fig.width=12, fig.height=10}
+#require(DATA606)
+inference(y = comma4bands$USES_Oxford, x = comma4bands$IncomeBands, est = "proportion", type = "ht",alternative = "greater", method = "theoretical",eda_plot = T,inf_plot =  T)
+```
+
+Unlike the earlier results for `AgeBands`, these results do not show a monotonic association with `IncomeBands` regarding the usage of the Oxford Comma.
+
+
+#### Simulation:
+```{r inference-function-Simulation-5, eval=T, fig.width=12, fig.height=7}
+#require(DATA606)
+inference(y = comma4bands$USES_Oxford, x = comma4bands$IncomeBands, est = "proportion", type = "ht",alternative = "greater", method = "simulation",eda_plot = T,inf_plot =  T)
+```
+
+
+The simulation gives results which are consistent with the theoretical.
+In the earlier results, the p-values were so small that the software was not able to display any difference between the theoretical value and the simulated value.  
+Here, we observe that the theoretical p-value is 0.0295, while the simulated p-value is slightly different (the exact value differs from run to run.)
+
+
+
+#### Cramer's V for `IncomeBands` 
+```{r assocstats-5, eval=T}
+#require(vcd)
+assocstats(xtabs( ~  IncomeBands +USES_Oxford, data=comma4bands))
+
+# Cramer's V
+#require(questionr)
+cramer.v(xtabs( ~  IncomeBands +USES_Oxford, data=comma4bands))
+```
+
+The result here, 0.113971, is not as strong as those computed above with respect to `CARE_Oxford` and `AgeBands`.
+
+#### Compute confidence  intervals on  Cramer's V for `IncomeBands`
+```{r cramerV-CI-5}
+#require(rcompanion)
+cramerV(xtabs( ~  IncomeBands +USES_Oxford, data=comma4bands),ci=TRUE,conf=0.95,histogram=T,R=1000)
+```
+
+The above result displays the confidence interval on Cramer's V for `IncomeBands` vs. `USES_Oxford`, based upon 1000 bootstrap samples.  (The values will fluctuate slightly across runs.)
+
+The results here are substantially lower than those for the variables considered above.  However, note that here we are not seeking to determine whether or not the confidence interval covers zero -- because Cramer's V cannot be negative.  The test of significance is determined by the Chi-Squared statistic and the associated p-value, while Cramer's V illustrates the strength of the relationship, assuming significance has been established.
+
+### Part 5 - Conclusion
+
+The dataset indicates a negative correlation between usage of the Oxford comma and Age of the participant, with younger people most likely to use the Oxford Comma.  In retrospect, it would have been preferable to have a dataset with more granularity on the quantitative variables (`Age` and `Income`) rather than what was available, with such items folded into the 4 and 5 bands (respectively) provided.
+
+One question is whether similar results would be obtained if we treated the Quantitative variables (Age and Income) as numeric rather than categorical by imputing specific numeric figures to each observation (e.g, by adding random jitter to the midpoint of the band, or by randomly simulating such variables within each respective band). 
+
+Numerical results from such imputation were inconclusive and have been dropped from the report.
+(The scatterplots shown above use the jittered values only for display of the points; the calculation of each regression line imputed the midpoint value for each observation in its respective band.)
+
+### ***References***
+
+ 
+1. <a name="a"/> Hickey, Walt, "Elitist, Superfluous, Or Popular? We Polled Americans on the Oxford Comma" (June 17, 2014), FiveThirtyEight.com . Retrieved May 15, 2019, from  <https://fivethirtyeight.com/features/elitist-superfluous-or-popular-we-polled-americans-on-the-oxford-comma/>.
+
+2. <a name="b"/> FiveThirtyEight.com survey of Oxford Comma Usage (2014, June). Retrieved May 15, 2019, from  <https://raw.githubusercontent.com/fivethirtyeight/data/master/comma-survey/comma-survey.csv>.   
+
+
+3. <a name="c"/> Diez, D. M., Barr, C. D., & Cetinkaya-Rundel, M. (2012). OpenIntro statistics. Lexington, KY: CreateSpace.
+Can be downloaded from <https://www.openintro.org/stat/textbook.php?stat_book=os>
+
+4. <a name="d"/> Yampol, M. (May, 2019). GitHub. from <https://github.com/myampol/MY606/tree/master/>
+
+5. <a name="e"/> Victor, Daniel, "Lack of Oxford Comma Could Cost Maine Company Millions in Overtime Dispute" (March 16, 2017), New York Times.  Retrieved on May 15, 2019 from
+<https://www.nytimes.com/2017/03/16/us/oxford-comma-lawsuit.html>
+
+
+
+6. <a name="f"/> Victor, Daniel, "Oxford Comma Dispute Is Settled as Maine Drivers Get $5 Million" (February 9, 2018), New York Times.  Retrieved on May 15, 2019 from <https://www.nytimes.com/2018/02/09/us/oxford-comma-maine.html>
+
+7. <a name="g"/> O'Connor v. Oakhurst Dairy, No. 16-1901 (1st Cir. 2017).  Retrieved on May 15, 2019 from <https://law.justia.com/cases/federal/appellate-courts/ca1/16-1901/16-1901-2017-03-13.html>
+
+
